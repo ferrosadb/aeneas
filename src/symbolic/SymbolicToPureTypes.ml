@@ -396,9 +396,10 @@ let rec translate_fwd_ty (span : Meta.span option) (decls_ctx : C.decls_ctx)
          consumer here, and are dropped rather than asserted on. *)
       if generics <> TypesUtils.empty_generic_args then
         [%warn_opt_span] span
-          ("Associated type projection with generic arguments: they are dropped, so distinct "
-         ^ "instantiations share one Lean type. Trait declarations carrying such associated "
-         ^ "types are refused separately.");
+          ("Associated type projection with generic arguments: they are \
+            dropped, so distinct "
+         ^ "instantiations share one Lean type. Trait declarations carrying \
+            such associated " ^ "types are refused separately.");
       let trait_ref = translate_fwd_trait_ref span decls_ctx trait_ref in
       TTraitType (trait_ref, type_name)
   | TFnDef { binder_regions; binder_value = { kind; generics }; _ } -> (

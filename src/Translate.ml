@@ -1084,22 +1084,23 @@ let trait_impl_is_builtin (ctx : gen_ctx) (id : Pure.trait_impl_id) : bool =
       ctx.trans_trait_decls
   with
   | None ->
-      [%warn_opt_span]
-        (Some trait_impl.item_meta.span)
+      [%warn_opt_span] (Some trait_impl.item_meta.span)
         ("Skipping the trait implementation '" ^ trait_impl.name
        ^ "': its trait declaration is not part of the translation");
       true
-  | Some trait_decl -> (
+  | Some trait_decl ->
       let builtin_info =
         let open ExtractBuiltin in
-        match TraitImplId.Map.find_opt trait_impl.def_id ctx.crate.trait_impls with
+        match
+          TraitImplId.Map.find_opt trait_impl.def_id ctx.crate.trait_impls
+        with
         | None -> None
         | Some crate_impl ->
-            match_name_with_generics_find_opt ctx.trans_ctx trait_decl.item_meta.name
-              crate_impl.impl_trait.generics
+            match_name_with_generics_find_opt ctx.trans_ctx
+              trait_decl.item_meta.name crate_impl.impl_trait.generics
               (builtin_trait_impls_map ())
       in
-      Option.is_some builtin_info)
+      Option.is_some builtin_info
 
 (** Export a trait declaration. *)
 let export_trait_decl (fmt : Format.formatter) (_config : gen_config)
@@ -1309,7 +1310,7 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
      emitting it would shadow a real model. And the text goes through the same box/break sequence as a
      declaration, because printing onto the formatter by hand desynchronises it and silently drops the
      blank lines between every later declaration. *)
-  if config.extract_types && config.extract_trait_decls then
+  if config.extract_types && config.extract_trait_decls then (
     let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
     TraitDeclId.Map.iter
       (fun (id : TraitDeclId.id) (def : LlbcAst.trait_decl) ->
@@ -1331,83 +1332,88 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
             Format.pp_open_hvbox fmt 0;
             Format.pp_print_string fmt "def ";
             Format.pp_print_string fmt
-              (ExtractBase.ctx_get (Some def.item_meta.span) (TraitDeclId id) ctx);
+              (ExtractBase.ctx_get (Some def.item_meta.span) (TraitDeclId id)
+                 ctx);
             Format.pp_print_string fmt (" " ^ binder_str ^ " : Type := sorry");
             Format.pp_close_box fmt ();
             Format.pp_print_break fmt 0 0
           with CFailure _ -> ())
       ctx.crate.trait_decls;
 
-  (* The same for an impl whose trait is not translated: its methods are emitted, but the instance
+    (* The same for an impl whose trait is not translated: its methods are emitted, but the instance
      value that call sites pass has no declaration. Emit it as a hole of the trait applied to the
      impl's own type arguments, which are already printable from the LLBC impl. *)
-  if config.extract_types && config.extract_trait_decls then
-    let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
-    TraitImplId.Map.iter
-      (fun (id : TraitImplId.id) (def : LlbcAst.trait_impl) ->
-        let trait_id = def.impl_trait.id in
-        if
-          (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
-          && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
-          && match_name_find_opt ctx.trans_ctx
-               (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta.name
-               builtin_traits
-             = None
-        then
-          try
-            let trait_name = ExtractBase.ctx_get None (TraitDeclId trait_id) ctx in
-            let types, consts =
-              ExtractBase.llbc_generic_args_to_strings ctx def.impl_trait.generics
-            in
-            let impl_name =
-              ExtractBase.ctx_compute_trait_impl_name_raw ctx id
-            in
-            (* The LLBC printer renders Rust syntax (`&'b str`), which is not a Lean type. When an
+    if config.extract_types && config.extract_trait_decls then (
+      let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
+      TraitImplId.Map.iter
+        (fun (id : TraitImplId.id) (def : LlbcAst.trait_impl) ->
+          let trait_id = def.impl_trait.id in
+          if
+            (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
+            && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
+            && match_name_find_opt ctx.trans_ctx
+                 (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta
+                   .name builtin_traits
+               = None
+          then
+            try
+              let trait_name =
+                ExtractBase.ctx_get None (TraitDeclId trait_id) ctx
+              in
+              let types, consts =
+                ExtractBase.llbc_generic_args_to_strings ctx
+                  def.impl_trait.generics
+              in
+              let impl_name =
+                ExtractBase.ctx_compute_trait_impl_name_raw ctx id
+              in
+              (* The LLBC printer renders Rust syntax (`&'b str`), which is not a Lean type. When an
                argument is not printable, fall back to the self type carried by the impl's own name:
                aeneas builds it as `<self type>.Insts.<trait>`. Sound only with one type argument and
                no const generic; anything else is left for a later pass. *)
-            let lean_safe s =
-              String.for_all
-                (function
-                  | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' | '_' | '(' | ')' ->
-                      true
-                  | _ -> false)
-                s
-            in
-            let args = types @ consts in
-            let args =
-              if List.for_all lean_safe args then Some args
-              else if List.length types = 1 && consts = [] then
-                match String.index_opt impl_name '.' with
-                | Some i
-                  when String.starts_with ~prefix:".Insts."
-                         (String.sub impl_name i
-                            (String.length impl_name - i)) ->
-                    Some [ String.sub impl_name 0 i ]
-                | _ -> None
-              else None
-            in
-            match args with
-            | None -> ()
-            | Some args ->
-                Format.pp_open_hvbox fmt 0;
-                Format.pp_print_string fmt ("def " ^ impl_name ^ " : " ^ trait_name);
-                List.iter
-                  (fun a -> Format.pp_print_string fmt (" " ^ a))
-                  args;
-                Format.pp_print_string fmt " := sorry";
-                Format.pp_close_box fmt ();
-                Format.pp_print_break fmt 0 0
-          with CFailure _ -> ())
-      ctx.crate.trait_impls;
+              let lean_safe s =
+                String.for_all
+                  (function
+                    | 'a' .. 'z'
+                    | 'A' .. 'Z'
+                    | '0' .. '9'
+                    | '.' | '_' | '(' | ')' -> true
+                    | _ -> false)
+                  s
+              in
+              let args = types @ consts in
+              let args =
+                if List.for_all lean_safe args then Some args
+                else if List.length types = 1 && consts = [] then
+                  match String.index_opt impl_name '.' with
+                  | Some i
+                    when String.starts_with ~prefix:".Insts."
+                           (String.sub impl_name i
+                              (String.length impl_name - i)) ->
+                      Some [ String.sub impl_name 0 i ]
+                  | _ -> None
+                else None
+              in
+              match args with
+              | None -> ()
+              | Some args ->
+                  Format.pp_open_hvbox fmt 0;
+                  Format.pp_print_string fmt
+                    ("def " ^ impl_name ^ " : " ^ trait_name);
+                  List.iter (fun a -> Format.pp_print_string fmt (" " ^ a)) args;
+                  Format.pp_print_string fmt " := sorry";
+                  Format.pp_close_box fmt ();
+                  Format.pp_print_break fmt 0 0
+            with CFailure _ -> ())
+        ctx.crate.trait_impls;
 
-  List.iter
-    (fun g ->
-      try export_decl_group g
-      with CFailure _ ->
-        (* An exception was raised: ignore it *)
-        ())
-    (Option.get ctx.crate.declarations)
+      List.iter
+        (fun g ->
+          try export_decl_group g
+          with CFailure _ ->
+            (* An exception was raised: ignore it *)
+            ())
+        (Option.get ctx.crate.declarations)))
 
 type extract_file_info = {
   filename : string;
