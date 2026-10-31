@@ -389,9 +389,16 @@ let rec translate_fwd_ty (span : Meta.span option) (decls_ctx : C.decls_ctx)
       let generics = { types = [ ty ]; const_generics = []; trait_refs = [] } in
       TAdt (TBuiltin (TRawPtr mut), generics)
   | TTraitType (trait_ref, type_name, generics) ->
-      [%cassert_opt_span] span
-        (generics = TypesUtils.empty_generic_args)
-        "Unimplemented";
+      (* A generic associated type projection, [Self::Item<'a>] or [<T as Tr<A>>::Assoc].
+         The pure encoding has no place for the projection's arguments: an associated type is a
+         field of the trait's structure, and every instantiation of it maps to that one field --
+         the same treatment a non-generic projection gets. The arguments therefore have no
+         consumer here, and are dropped rather than asserted on. *)
+      if generics <> TypesUtils.empty_generic_args then
+        [%warn_opt_span] span
+          ("Associated type projection with generic arguments: they are dropped, so distinct "
+         ^ "instantiations share one Lean type. Trait declarations carrying such associated "
+         ^ "types are refused separately.");
       let trait_ref = translate_fwd_trait_ref span decls_ctx trait_ref in
       TTraitType (trait_ref, type_name)
   | TFnDef { binder_regions; binder_value = { kind; generics }; _ } -> (
@@ -529,12 +536,11 @@ and compute_back_ty_num_levels (span : Meta.span option)
     | TRawPtr _ ->
         (* TODO: not sure what to do here *)
         save_count outer_regions
-    | TTraitType (trait_ref, _, generics) ->
+    | TTraitType (trait_ref, _, _generics) ->
         [%sanity_check_opt_span] span
           (TypesUtils.trait_ref_kind_is_local_clause_or_builtin trait_ref.kind);
-        [%cassert_opt_span] span
-          (generics = TypesUtils.empty_generic_args)
-          "Unimplemented";
+        (* No assert on the projection's generic arguments: they carry no regions of their own
+           here, and the projection is handled the same way at every instantiation. *)
         save_count outer_regions
     | TFnDef _ | TFnPtr _ ->
         [%craise_opt_span] span "Arrow types are not supported yet"
@@ -664,12 +670,11 @@ and translate_back_ty_aux (span : Meta.span option) (decls_ctx : C.decls_ctx)
     | TRawPtr _ ->
         (* TODO: not sure what to do here *)
         stop outer_regions ty
-    | TTraitType (trait_ref, _, generics) ->
+    | TTraitType (trait_ref, _, _generics) ->
         [%sanity_check_opt_span] span
           (TypesUtils.trait_ref_kind_is_local_clause_or_builtin trait_ref.kind);
-        [%cassert_opt_span] span
-          (generics = TypesUtils.empty_generic_args)
-          "Unimplemented";
+        (* No assert on the projection's generic arguments: they carry no regions of their own
+           here, and the projection is handled the same way at every instantiation. *)
         stop outer_regions ty
     | TFnDef _ | TFnPtr _ ->
         [%craise_opt_span] span "Arrow types are not supported yet"

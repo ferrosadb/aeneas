@@ -2262,7 +2262,13 @@ let extract_fun_decl_gen (ctx : extraction_ctx) (fmt : F.formatter)
     F.pp_close_box fmt ()
   in
   (* Print the "=" *)
-  if not is_opaque then (
+  if is_opaque then (
+    (* Lean only: a declaration nobody models is emitted as a hole rather than as an axiom, so that a
+       completeness check can find it and a model can replace it. *)
+    if backend () = Lean then (
+      F.pp_print_space fmt ();
+      F.pp_print_string fmt ":= sorry"))
+  else (
     F.pp_print_space fmt ();
     let eq =
       match backend () with
@@ -3204,8 +3210,9 @@ let extract_trait_decl (ctx : extraction_ctx) (fmt : F.formatter)
     ctx_add_generic_params decl.item_meta.span decl.item_meta.name Item
       decl.llbc_generics generics ctx
   in
-  extract_generic_params decl.item_meta.span ctx fmt TypeDeclId.Set.empty Item
-    generics (Some decl.explicit_info) type_params cg_params trait_clauses;
+  extract_generic_params decl.item_meta.span ctx fmt TypeDeclId.Set.empty
+    ~force_mono:true Item generics (Some decl.explicit_info) type_params cg_params
+    trait_clauses;
 
   F.pp_print_space fmt ();
   if is_empty && backend () = FStar then (

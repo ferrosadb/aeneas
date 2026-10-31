@@ -34,6 +34,18 @@ let erase_regions_substitute_types (subst : subst) (ty : ty) : ty =
   erase_static_visitor#visit_ty ()
     (Charon.Substitute.erase_regions_substitute_types subst ty)
 
+(** Shadows {!Charon.Substitute.type_decl_get_instantiated_field_types}: a type Charon left opaque has
+    no fields to hand out, and Charon reports that as [Invalid_argument] with the whole declaration in
+    the message. That is a limit of the extraction rather than a violated invariant, so report it as a
+    translation error, which skips this item and leaves the rest of the run alone. *)
+let type_decl_get_instantiated_field_types (def : type_decl)
+    (opt_variant_id : VariantId.id option) (generics : generic_args) : ty list =
+  if type_decl_is_opaque def then
+    [%craise] def.item_meta.span "Cannot get the fields of an opaque type"
+  else
+    Charon.Substitute.type_decl_get_instantiated_field_types def opt_variant_id
+      generics
+
 (** Shadows {!Charon.Substitute.type_decl_get_instantiated_field_etypes} (we
     also erase the static region) *)
 let type_decl_get_instantiated_field_etypes (def : type_decl)

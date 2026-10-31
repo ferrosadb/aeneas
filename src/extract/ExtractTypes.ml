@@ -1322,7 +1322,7 @@ let extract_generic_params (span : Meta.span) (ctx : extraction_ctx)
     (fmt : F.formatter) (no_params_tys : TypeDeclId.Set.t) ?(use_forall = false)
     ?(use_fun = false) ?(use_forall_use_sep = true) ?(use_arrows = false)
     ?(as_implicits : bool = false) ?(space : bool ref option = None)
-    (origin : generic_origin) (generics : generic_params)
+    ?(force_mono = false) (origin : generic_origin) (generics : generic_params)
     (explicit : explicit_info option) (type_params : string list)
     (cg_params : string list) (trait_clauses : string list) : unit =
   let all_params = List.concat [ type_params; cg_params; trait_clauses ] in
@@ -1379,7 +1379,12 @@ let extract_generic_params (span : Meta.span) (ctx : extraction_ctx)
               (* Generic trait-method parameters are bound inside a structure
                  field, where Lean can't infer a universe for [Type _]: they
                  stay in [Type]. *)
-              F.pp_print_string fmt (type_keyword ~poly:(origin = Item) span);
+              (* A trait declaration is a structure too: its parameters are bound in a header
+                 whose fields contain [Dyn]-wrapped trait refs, and Lean cannot infer a universe
+                 for [Type _] there ("Failed to infer universe levels in type of field"). Forcing
+                 [Type] keeps the universes ground, exactly as for trait-method parameters. *)
+              F.pp_print_string fmt
+                (type_keyword ~poly:(origin = Item && not force_mono) span);
               (* ) *)
               right_bracket expl)
             type_params;
@@ -1639,7 +1644,11 @@ let extract_type_decl_gen (ctx : extraction_ctx) (fmt : F.formatter)
       F.pp_print_space fmt ();
       F.pp_print_string fmt ":");
     F.pp_print_space fmt ();
-    F.pp_print_string fmt (type_keyword ~poly:false span));
+    F.pp_print_string fmt (type_keyword ~poly:false span);
+    (* Lean only: a type nobody models is a hole, not an axiom. *)
+    if backend () = Lean then (
+      F.pp_print_space fmt ();
+      F.pp_print_string fmt ":= sorry"));
   (* Close the box for "type TYPE_NAME (TYPE_PARAMS) =" *)
   F.pp_close_box fmt ();
   (if extract_body then

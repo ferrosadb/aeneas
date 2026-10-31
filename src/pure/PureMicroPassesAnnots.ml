@@ -111,9 +111,13 @@ let add_type_annotations_to_fun_decl (trans_ctx : trans_ctx)
                     [%sanity_check] span (List.length generics.types = 1);
                     Collections.List.repeat (List.length supd.updates)
                       (List.nth generics.types 0)
-                | _ ->
-                    PureTypeCheck.get_adt_field_types span type_decls adt_id
-                      None generics
+                | _ -> (
+                    match
+                      PureTypeCheck.get_adt_field_types_opt span type_decls
+                        adt_id None generics
+                    with
+                    | Some field_tys -> field_tys
+                    | None -> Collections.List.repeat (List.length supd.updates) hole)
               in
               [%ldebug
                 "- ty: " ^ ty_to_string ty ^ "\n- field_tys:\n"
@@ -320,8 +324,12 @@ let add_type_annotations_to_fun_decl (trans_ctx : trans_ctx)
                 when adt_id = adt_cons_id.adt_id ->
                   (* The type is known: let's compute the type of the fields and recurse *)
                   let field_tys =
-                    PureTypeCheck.get_adt_field_types span type_decls adt_id
-                      adt_cons_id.variant_id generics
+                    match
+                      PureTypeCheck.get_adt_field_types_opt span type_decls adt_id
+                        adt_cons_id.variant_id generics
+                    with
+                    | Some tys -> tys
+                    | None -> mk_holes ()
                   in
                   (* We shouldn't need to know the type of the constructor - just leaving
                      a hole for now *)
@@ -344,8 +352,12 @@ let add_type_annotations_to_fun_decl (trans_ctx : trans_ctx)
                                   generics.const_generics;
                             }
                           in
-                          PureTypeCheck.get_adt_field_types span type_decls
-                            adt_id adt_cons_id.variant_id generics
+                          (match
+                            PureTypeCheck.get_adt_field_types_opt span type_decls
+                              adt_id adt_cons_id.variant_id generics
+                          with
+                          | Some tys -> tys
+                          | None -> mk_holes ())
                       | _ -> mk_holes ()
                     in
                     (hole, args_tys, false)

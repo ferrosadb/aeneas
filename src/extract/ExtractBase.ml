@@ -533,16 +533,28 @@ let int_name (int_ty : integer_type) : string =
   | Unsigned U128 -> Printf.sprintf u_format 128
 
 let float_name (float_ty : float_type) : string =
-  let format =
-    match backend () with
-    | FStar | Coq | HOL4 -> format_of_string "f%d"
-    | Lean -> format_of_string "F%d"
-  in
-  match float_ty with
-  | F16 -> Printf.sprintf format 16
-  | F32 -> Printf.sprintf format 32
-  | F64 -> Printf.sprintf format 64
-  | F128 -> Printf.sprintf format 128
+  (* Lean has no [F32]/[F64] types: printing those names emits a type that exists nowhere in
+     Aeneas/Std, so a declaration mentioning it fails to elaborate ("contains universe level
+     metavariables") and every later reference reports unknownIdentifier. Lean's binary32 and
+     binary64 are [Float32] and [Float].
+
+     The other three backends spell every width in lower case. Matching on [backend ()] alone and
+     then on the width keeps the two conventions from bleeding into each other -- an earlier
+     version of this matched on the pair, and its catch-all arm sent F128 to the non-Lean backends
+     as [F128]. *)
+  match backend () with
+  | Lean -> (
+      match float_ty with
+      | F16 -> "F16"
+      | F32 -> "Float32"
+      | F64 -> "Float"
+      | F128 -> "F128")
+  | FStar | Coq | HOL4 -> (
+      match float_ty with
+      | F16 -> "f16"
+      | F32 -> "f32"
+      | F64 -> "f64"
+      | F128 -> "f128")
 
 let scalar_name (ty : literal_type) : string =
   match ty with
@@ -1410,8 +1422,8 @@ let type_decl_kind_to_qualif (span : Meta.span) (kind : decl_kind)
           | Some Struct -> Some "structure"
           | _ -> Some "inductive")
       | SingleRec | MutRecFirst | MutRecInner | MutRecLast -> Some "inductive"
-      | Builtin -> Some "axiom"
-      | Declared -> Some "axiom")
+      | Builtin -> Some "def"
+      | Declared -> Some "def")
   | HOL4 -> None
 
 (** Compute the qualified for a function definition/declaration.
@@ -1446,8 +1458,8 @@ let fun_decl_kind_to_qualif (kind : decl_kind) : string option =
       | MutRecFirst -> Some "def"
       | MutRecInner -> Some "def"
       | MutRecLast -> Some "def"
-      | Builtin -> Some "axiom"
-      | Declared -> Some "axiom")
+      | Builtin -> Some "def"
+      | Declared -> Some "def")
   | HOL4 -> None
 
 (** Compute the qualifier to add after the definition. *)

@@ -71,6 +71,21 @@ let get_adt_field_types (span : Meta.span)
              the array expressions are introduced as struct updates *)
           [%craise] span "Attempting to access the fields of an opaque type")
 
+(** Same as {!get_adt_field_types}, for calls that must tolerate an ADT the translation does not
+    carry: a filtered extraction, or a type from a crate left opaque. Returning [None] lets the
+    caller fall back to unknown types instead of ending the run with [Not_found]. *)
+let get_adt_field_types_opt (span : Meta.span)
+    (type_decls : type_decl TypeDeclId.Map.t) (type_id : type_id)
+    (variant_id : VariantId.id option) (generics : generic_args) : ty list option =
+  match type_id with
+  | TAdtId def_id when not (TypeDeclId.Map.mem def_id type_decls) ->
+      [%warn_opt_span]
+        (Some span)
+        ("Unknown type declaration " ^ TypeDeclId.to_string def_id
+       ^ ": it is not part of the translation");
+      None
+  | _ -> Some (get_adt_field_types span type_decls type_id variant_id generics)
+
 type tc_ctx = {
   decls_ctx : Contexts.decls_ctx;
   type_decls : type_decl TypeDeclId.Map.t;  (** The type declarations *)

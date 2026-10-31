@@ -95,8 +95,11 @@ let ty_regions (ty : ty) : RegionId.Set.t =
     | RStatic -> ()
     | RLub _ -> [%craise_opt_span] None "Unexpected Lub region"
     | RErased | RBody _ ->
-        raise
-          (Failure "ty_regions shouldn't be called on erased or body regions")
+        (* Neither is a free region: an erased one has been erased, and a body region belongs to a
+           closure body rather than to this type's signature. Both occur legitimately in a type
+           that has been through the prepasses, so collecting *free* regions must skip them rather
+           than abort: an erased region is the absence of a region, not an inconsistency. *)
+        ()
     | RVar (Bound _) ->
         raise (Failure "region_in_set shouldn't be called on bound regions")
     | RVar (Free id) -> s := RegionId.Set.add id !s

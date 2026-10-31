@@ -401,18 +401,31 @@ let translate_crate_to_pure (crate : crate) (marked_ids : marked_ids) :
       let translate_method_sig (trait_decl : LlbcAst.trait_decl)
           (method_id : TraitMethodId.id)
           (bound_method : LlbcAst.trait_method Types.binder) =
-        let sg =
-          SymbolicToPureTypes.translate_flat_trait_method_sigs trans_ctx
-            trait_decl method_id bound_method
-        in
-        (FunOrMethodId.Method (trait_decl.def_id, method_id), sg)
+        (* Unsupported constructs inside a signature raise [CFailure] from an assert. Left
+           uncaught it aborts the whole run with a stack trace and no output, which hides every
+           other item behind one bad signature. Report it and drop the method instead, the way
+           function signatures are handled below. *)
+        try
+          let sg =
+            SymbolicToPureTypes.translate_flat_trait_method_sigs trans_ctx
+              trait_decl method_id bound_method
+          in
+          Some (FunOrMethodId.Method (trait_decl.def_id, method_id), sg)
+        with CFailure error ->
+          [%warn_opt_span] error.span
+            ("Could not translate the signature of method '"
+            ^ name_to_string trans_ctx bound_method.binder_value.item_meta.name
+            ^ "' of trait '"
+            ^ name_to_string trans_ctx trait_decl.item_meta.name
+            ^ "': the construct is not supported, the method is dropped");
+          None
       in
       let translate_trait_methods (trait_decl : LlbcAst.trait_decl) =
         let methods =
           TraitDeclId.Map.find trait_decl.def_id
             trans_ctx.trait_methods_to_extract
         in
-        List.map
+        List.filter_map
           (fun (method_id, bound_method) ->
             translate_method_sig trait_decl method_id bound_method)
           (TraitMethodId.Map.to_list methods)
@@ -1062,20 +1075,31 @@ let trait_impl_is_builtin (ctx : gen_ctx) (id : Pure.trait_impl_id) : bool =
     [%silent_unwrap_opt_span] None
       (TraitImplId.Map.find_opt id ctx.trans_trait_impls)
   in
-  let trait_decl =
-    Pure.TraitDeclId.Map.find trait_impl.impl_trait.trait_decl_id
+  (* The trait declaration may be outside the translation set: a filtered extraction, or an impl of
+     a trait that lives in a crate left opaque. This lookup used to be [Map.find], which turned that
+     into a [Not_found] that killed the whole run instead of skipping one impl. An impl whose trait
+     was not translated cannot be modelled, so skip it and name it. *)
+  match
+    Pure.TraitDeclId.Map.find_opt trait_impl.impl_trait.trait_decl_id
       ctx.trans_trait_decls
-  in
-  let builtin_info =
-    let open ExtractBuiltin in
-    let trait_impl =
-      TraitImplId.Map.find trait_impl.def_id ctx.crate.trait_impls
-    in
-    match_name_with_generics_find_opt ctx.trans_ctx trait_decl.item_meta.name
-      trait_impl.impl_trait.generics
-      (builtin_trait_impls_map ())
-  in
-  Option.is_some builtin_info
+  with
+  | None ->
+      [%warn_opt_span]
+        (Some trait_impl.item_meta.span)
+        ("Skipping the trait implementation '" ^ trait_impl.name
+       ^ "': its trait declaration is not part of the translation");
+      true
+  | Some trait_decl -> (
+      let builtin_info =
+        let open ExtractBuiltin in
+        match TraitImplId.Map.find_opt trait_impl.def_id ctx.crate.trait_impls with
+        | None -> None
+        | Some crate_impl ->
+            match_name_with_generics_find_opt ctx.trans_ctx trait_decl.item_meta.name
+              crate_impl.impl_trait.generics
+              (builtin_trait_impls_map ())
+      in
+      Option.is_some builtin_info)
 
 (** Export a trait declaration. *)
 let export_trait_decl (fmt : Format.formatter) (_config : gen_config)
@@ -1206,12 +1230,19 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
                ^ String.concat "\n" decls);
             (* We still extract something so that the user can look at it and
              eventually fix it *)
-            (* TODO: update to extract groups *)
-            List.iter
-              (fun id ->
-                export_trait_decl_group id;
-                export_trait_decl_group_extra_info id)
-              ids)
+            (* Lean has no forward references, so a group whose declarations mention each other
+               only elaborates inside a [mutual] block, where each may refer to the others. *)
+            let mutual = Config.backend () = Lean in
+            if mutual then (
+              Format.pp_print_string fmt "mutual";
+              Format.pp_print_break fmt 0 0);
+            List.iter (fun id -> export_trait_decl_group id) ids;
+            if mutual then (
+              Format.pp_print_break fmt 0 0;
+              Format.pp_print_string fmt "end";
+              Format.pp_print_break fmt 0 0);
+            (* Extra info is not part of the recursive group, so it goes after the block. *)
+            List.iter (fun id -> export_trait_decl_group_extra_info id) ids)
     | TraitDeclGroup (NonRecGroup id) ->
         (* TODO: update to extract groups *)
         if config.extract_trait_decls && config.extract_transparent then (
@@ -1267,6 +1298,108 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
         [%craise_opt_span] None
           "Mixed-recursive declaration groups are not supported"
   in
+
+  (* A trait declaration the crate carries but does not translate is in no declaration group, so it is
+     never printed: a reference to it then names nothing and the file cannot elaborate. Emit it at the
+     boundary as a type former whose body is a hole — a hole rather than an axiom, so a model can
+     replace it and a completeness check can count it.
+
+     Two conditions keep this from doing more harm than good. A trait the Lean library already models
+     ([core.clone.Clone], [core.marker.Copy], ...) must not be redeclared here: it is builtin, and
+     emitting it would shadow a real model. And the text goes through the same box/break sequence as a
+     declaration, because printing onto the formatter by hand desynchronises it and silently drops the
+     blank lines between every later declaration. *)
+  if config.extract_types && config.extract_trait_decls then
+    let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
+    TraitDeclId.Map.iter
+      (fun (id : TraitDeclId.id) (def : LlbcAst.trait_decl) ->
+        if
+          (not (Pure.TraitDeclId.Map.mem id ctx.trans_trait_decls))
+          && match_name_find_opt ctx.trans_ctx def.item_meta.name builtin_traits
+             = None
+        then
+          try
+            let binder i _ =
+              Printf.sprintf "(%s : Type _)"
+                (if i = 0 then "Self" else "T" ^ string_of_int i)
+            in
+            let binder_str =
+              match def.generics.types with
+              | [] -> "(Self : Type _)"
+              | params -> String.concat " " (List.mapi binder params)
+            in
+            Format.pp_open_hvbox fmt 0;
+            Format.pp_print_string fmt "def ";
+            Format.pp_print_string fmt
+              (ExtractBase.ctx_get (Some def.item_meta.span) (TraitDeclId id) ctx);
+            Format.pp_print_string fmt (" " ^ binder_str ^ " : Type := sorry");
+            Format.pp_close_box fmt ();
+            Format.pp_print_break fmt 0 0
+          with CFailure _ -> ())
+      ctx.crate.trait_decls;
+
+  (* The same for an impl whose trait is not translated: its methods are emitted, but the instance
+     value that call sites pass has no declaration. Emit it as a hole of the trait applied to the
+     impl's own type arguments, which are already printable from the LLBC impl. *)
+  if config.extract_types && config.extract_trait_decls then
+    let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
+    TraitImplId.Map.iter
+      (fun (id : TraitImplId.id) (def : LlbcAst.trait_impl) ->
+        let trait_id = def.impl_trait.id in
+        if
+          (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
+          && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
+          && match_name_find_opt ctx.trans_ctx
+               (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta.name
+               builtin_traits
+             = None
+        then
+          try
+            let trait_name = ExtractBase.ctx_get None (TraitDeclId trait_id) ctx in
+            let types, consts =
+              ExtractBase.llbc_generic_args_to_strings ctx def.impl_trait.generics
+            in
+            let impl_name =
+              ExtractBase.ctx_compute_trait_impl_name_raw ctx id
+            in
+            (* The LLBC printer renders Rust syntax (`&'b str`), which is not a Lean type. When an
+               argument is not printable, fall back to the self type carried by the impl's own name:
+               aeneas builds it as `<self type>.Insts.<trait>`. Sound only with one type argument and
+               no const generic; anything else is left for a later pass. *)
+            let lean_safe s =
+              String.for_all
+                (function
+                  | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' | '_' | '(' | ')' ->
+                      true
+                  | _ -> false)
+                s
+            in
+            let args = types @ consts in
+            let args =
+              if List.for_all lean_safe args then Some args
+              else if List.length types = 1 && consts = [] then
+                match String.index_opt impl_name '.' with
+                | Some i
+                  when String.starts_with ~prefix:".Insts."
+                         (String.sub impl_name i
+                            (String.length impl_name - i)) ->
+                    Some [ String.sub impl_name 0 i ]
+                | _ -> None
+              else None
+            in
+            match args with
+            | None -> ()
+            | Some args ->
+                Format.pp_open_hvbox fmt 0;
+                Format.pp_print_string fmt ("def " ^ impl_name ^ " : " ^ trait_name);
+                List.iter
+                  (fun a -> Format.pp_print_string fmt (" " ^ a))
+                  args;
+                Format.pp_print_string fmt " := sorry";
+                Format.pp_close_box fmt ();
+                Format.pp_print_break fmt 0 0
+          with CFailure _ -> ())
+      ctx.crate.trait_impls;
 
   List.iter
     (fun g ->
@@ -1687,6 +1820,26 @@ let extract_translated_crate (filename : string) (dest_dir : string)
                 (IdTraitDecl def.def_id));
           ctx)
       ctx trans_trait_decls
+  in
+
+  (* A trait declaration the crate carries but does not translate is still reachable: it is the type of
+     an instance parameter in an external function's signature, and the prefix of every instance name
+     below it. Without a registered name the reference prints a hole, which is not a declaration and
+     cannot elaborate. The full registration above starts from the Pure declaration a translated trait
+     has, so compute the same name from the LLBC declaration and register only that. *)
+  let ctx =
+    TraitDeclId.Map.fold
+      (fun (id : TraitDeclId.id) (def : LlbcAst.trait_decl) (ctx : gen_ctx) ->
+        if Pure.TraitDeclId.Map.mem id ctx.trans_trait_decls then ctx
+        else
+          try
+            let name =
+              ExtractBase.ctx_compute_type_name def.item_meta ctx
+                def.item_meta.name
+            in
+            ExtractBase.ctx_add def.item_meta.span (TraitDeclId id) name ctx
+          with CFailure _ -> ctx)
+      trans_ctx.crate.trait_decls ctx
   in
 
   let ctx =
