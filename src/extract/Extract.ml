@@ -3204,8 +3204,9 @@ let extract_trait_decl (ctx : extraction_ctx) (fmt : F.formatter)
     ctx_add_generic_params decl.item_meta.span decl.item_meta.name Item
       decl.llbc_generics generics ctx
   in
-  extract_generic_params decl.item_meta.span ctx fmt TypeDeclId.Set.empty Item
-    generics (Some decl.explicit_info) type_params cg_params trait_clauses;
+  extract_generic_params decl.item_meta.span ctx fmt TypeDeclId.Set.empty
+    ~force_mono:true Item generics (Some decl.explicit_info) type_params cg_params
+    trait_clauses;
 
   F.pp_print_space fmt ();
   if is_empty && backend () = FStar then (
