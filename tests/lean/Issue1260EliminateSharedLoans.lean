@@ -54,3 +54,4 @@ def f (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
   f_loop y x 0#u32
 
 end issue_1260_eliminate_shared_loans
+end

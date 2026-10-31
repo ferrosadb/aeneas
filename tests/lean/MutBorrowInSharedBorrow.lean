@@ -126,3 +126,4 @@ def use_mixed_borrows_param
   ok ((i, i1), mutable)
 
 end mut_borrow_in_shared_borrow
+end

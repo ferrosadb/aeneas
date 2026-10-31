@@ -48,3 +48,4 @@ def index_empty_array : Result Unit := do
   ok ()
 
 end arrays_defs
+end

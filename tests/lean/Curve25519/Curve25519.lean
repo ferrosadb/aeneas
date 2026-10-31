@@ -119,3 +119,4 @@ def mul_internal
   Array.update z8 8#usize i50
 
 end curve25519
+end

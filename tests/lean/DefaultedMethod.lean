@@ -92,3 +92,4 @@ def main : Result Unit := do
   massert (n = 1#i32)
 
 end defaulted_method
+end

@@ -42,3 +42,4 @@ inductive E3 where
 | V : Slice E3 → E3
 
 end issue_1138_slice_positivity
+end

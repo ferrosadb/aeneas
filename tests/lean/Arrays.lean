@@ -755,3 +755,4 @@ def Scalar := Array Std.U32 2#usize
 def L : Scalar := Array.make 2#usize [ 0#u32, 1#u32 ]
 
 end arrays
+end

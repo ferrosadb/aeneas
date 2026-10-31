@@ -48,3 +48,4 @@ def gt (a : Bool) (b : Bool) : Result Bool := do
   ok (a > b)
 
 end bool_cmp
+end

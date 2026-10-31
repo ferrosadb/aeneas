@@ -48,3 +48,4 @@ def print_vec : Result Unit := do
   std.io.stdio._print a1
 
 end string_chars
+end

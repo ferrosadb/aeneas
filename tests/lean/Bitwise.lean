@@ -74,3 +74,4 @@ def xor_bool (a : Bool) (b : Bool) : Result Bool := do
   ok (a ^^ b)
 
 end bitwise
+end

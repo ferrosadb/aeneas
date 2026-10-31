@@ -50,3 +50,4 @@ def BigStruct :=
   BigStructName × BigStructName
 
 end adt
+end

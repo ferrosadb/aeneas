@@ -247,3 +247,4 @@ def loop_consume_u32 (params : WrapperU32) : Result Unit := do
   loop_consume_u32_loop { start := 0#i32, «end» := 32#i32 } params.x
 
 end loops_issues
+end

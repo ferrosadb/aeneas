@@ -117,3 +117,4 @@ def dispatch_add (i : Std.U32) (i1 : Std.U32) : Result Std.U32 := do
   else dispatch_add.«aarch64-apple-darwin» i i1
 
 end target_features
+end

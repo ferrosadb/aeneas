@@ -162,3 +162,4 @@ def call_it (n : Std.U32) : Result (alloc.vec.Vec Std.U32) := do
     core.iter.range.StepU32) { start := 0#u32, «end» := n }
 
 end issue_1043_iterator_methods
+end

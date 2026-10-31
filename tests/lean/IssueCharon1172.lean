@@ -53,3 +53,4 @@ def new : Result Unit := do
   ok ()
 
 end issue_charon_1172
+end

@@ -1034,3 +1034,4 @@ def as_radix_minimized : Result Unit := do
   as_radix_minimized_loop scalar 0#usize
 
 end loops_rec
+end

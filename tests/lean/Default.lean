@@ -42,3 +42,4 @@ def f2 : Result Unit := do
   ok ()
 
 end default
+end

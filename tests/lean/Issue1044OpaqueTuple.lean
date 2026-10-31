@@ -77,3 +77,4 @@ def update_adjacent (a : GF16) (into : Slice GF16) : Result (Slice GF16) := do
   update_adjacent_loop a into 0#usize
 
 end issue_1044_opaque_tuple
+end

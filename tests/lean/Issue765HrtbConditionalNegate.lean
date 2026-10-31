@@ -191,3 +191,4 @@ def call_transparent_blanket_impl (choice : Choice) : Result F := do
     SharedAF.Insts.CoreOpsArithNegF () choice
 
 end issue_765_hrtb_conditional_negate
+end

@@ -958,3 +958,4 @@ def refs_eq (a : Struct6Fields) (b : Struct6Fields) : Result Bool := do
   Struct6Fields.Insts.CoreCmpPartialEqStruct6Fields.eq a b
 
 end derive
+end

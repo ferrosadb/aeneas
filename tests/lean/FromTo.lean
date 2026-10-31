@@ -62,3 +62,4 @@ def U32.Insts.From_toTo : To Std.U32 := {
 }
 
 end from_to
+end

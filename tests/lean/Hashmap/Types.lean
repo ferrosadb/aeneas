@@ -48,3 +48,4 @@ structure HashMap (T : Type _) where
   slots : alloc.vec.Vec (AList T)
 
 end hashmap
+end

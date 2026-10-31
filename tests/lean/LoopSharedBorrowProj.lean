@@ -94,3 +94,4 @@ def carve (cap_ref : Cap) (x : Std.U32) : Result Bool := do
   carve_loop iter x
 
 end loop_shared_borrow_proj
+end

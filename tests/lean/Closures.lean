@@ -306,3 +306,4 @@ def map_fn_pointer (x : alloc.vec.Vec Std.U8) : Result Unit := do
   ok ()
 
 end closures
+end

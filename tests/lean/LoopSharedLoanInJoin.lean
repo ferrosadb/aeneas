@@ -129,3 +129,4 @@ def State.extract
   ok ({ self with data := a, index := i }, result1)
 
 end loop_shared_loan_in_join
+end

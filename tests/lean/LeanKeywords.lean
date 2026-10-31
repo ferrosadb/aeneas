@@ -111,3 +111,4 @@ theorem Rec.v._simpLemma_ («end» : Option Rec) (v : Std.U32) :
   (Rec.mk «end» v).v = v := by rfl
 
 end lean_keywords
+end

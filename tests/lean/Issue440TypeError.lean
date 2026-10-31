@@ -40,3 +40,4 @@ def f (x : PeanoNum) (value : Std.Isize) : Result PeanoNum := do
   | PeanoNum.Succ _ => ok x
 
 end issue_440_type_error
+end

@@ -35,3 +35,4 @@ def Arguments.none (x : Arguments) : Result (Array Arguments 1#usize) := do
   ok (Array.make 1#usize [ () ])
 
 end issue_803_self_in_array
+end

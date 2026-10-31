@@ -68,3 +68,4 @@ def fill
   fill_loop corecloneCloneInst { start := 0#usize, «end» := i } s value
 
 end drop
+end

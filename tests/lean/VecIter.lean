@@ -398,3 +398,4 @@ def for_over_vec_of_slices
   for_over_vec_of_slices_loop iter
 
 end vec_iter
+end

@@ -83,3 +83,4 @@ def each_ref (s : Array Std.U8 10#usize) : Result (Array Std.U8 10#usize) := do
     each_ref.closure.Insts.CoreOpsFunctionFnMutTupleUsizeShared0U8 s
 
 end issue_804_closure_return_ref
+end

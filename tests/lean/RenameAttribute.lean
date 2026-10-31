@@ -126,3 +126,4 @@ def No_borrows_sum (max : Std.U32) : Result Std.U32 := do
   s * 2#u32
 
 end rename_attribute
+end

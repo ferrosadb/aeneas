@@ -360,3 +360,4 @@ def assert_or_in_loop
   assert_or_in_loop_loop { start := 0#usize, «end» := 10#usize } a
 
 end assert_cfg
+end

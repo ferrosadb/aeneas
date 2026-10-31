@@ -260,3 +260,4 @@ def loop_wrap2
   loop_wrap2_loop Wrap2Inst w n 0#u32 0#u32
 
 end issue_1436_loop_generics_rec
+end

@@ -39,3 +39,4 @@ def call_with_unit (n : Std.U32) : Result Std.U32 := do
   ok n2
 
 end generic_unit_output
+end

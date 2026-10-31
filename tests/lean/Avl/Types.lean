@@ -83,3 +83,4 @@ structure Tree (T : Type _) where
   root : Option (Node T)
 
 end avl
+end

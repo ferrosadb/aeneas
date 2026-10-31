@@ -312,3 +312,4 @@ def isize_overflowing_div
   core.num.Isize.overflowing_div x y
 
 end overflowing_ops
+end

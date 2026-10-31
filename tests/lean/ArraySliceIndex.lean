@@ -77,3 +77,4 @@ def slice_use_get_mut_range_from
     Std.U32) s { start := 0#usize }
 
 end array_slice_index
+end

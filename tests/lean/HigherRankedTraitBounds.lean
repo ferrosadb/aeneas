@@ -93,3 +93,4 @@ def ignore_higher_ranked_fn
   ok ()
 
 end higher_ranked_trait_bounds
+end

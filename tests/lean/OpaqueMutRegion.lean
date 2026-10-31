@@ -49,3 +49,4 @@ def WrapperRaw.id
   ok (self, fun self1 => self1)
 
 end opaque_mut_region
+end

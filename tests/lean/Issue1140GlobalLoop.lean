@@ -76,3 +76,4 @@ def C_loop (sum : Std.U32) (i : Std.U32) : Result Std.U32 := do
 @[global_simps, irreducible] def C : Result Std.U32 := C_loop 0#u32 0#u32
 
 end issue_1140_global_loop
+end

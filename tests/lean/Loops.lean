@@ -1268,3 +1268,4 @@ def single_break (d : Slice Std.U8) : Result Unit := do
   single_break_loop d
 
 end loops
+end

@@ -68,3 +68,4 @@ structure TreeSet (T : Type _) where
   root : Option (Node T)
 
 end bst
+end

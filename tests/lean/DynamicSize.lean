@@ -42,3 +42,4 @@ def alloc_wrapper (N : Std.Usize) : Result (Wrapper (Slice Std.U8)) := do
   ok { data := (Std.Array.to_slice a) }
 
 end dynamic_size
+end

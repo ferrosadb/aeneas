@@ -55,3 +55,4 @@ def iter (n : Std.Usize) : Result Unit := do
   iter_loop { start := 0#usize, «end» := n } 0#i32
 
 end iterators_scalar
+end

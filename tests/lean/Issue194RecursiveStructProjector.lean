@@ -63,3 +63,4 @@ def get_left {T : Type _} (x : AVLNode T) : Result (Option (AVLNode T)) := do
   ok x.left
 
 end issue_194_recursive_struct_projector
+end

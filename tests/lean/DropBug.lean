@@ -126,3 +126,4 @@ def OuterNoDrop.init (self : OuterNoDrop) : Result OuterNoDrop := do
   ok { self with inner := ind }
 
 end drop_bug
+end

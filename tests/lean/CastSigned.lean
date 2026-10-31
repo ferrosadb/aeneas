@@ -176,3 +176,4 @@ def test_isize_cast_unsigned_neg_one : Result Unit := do
 #guard (test_isize_cast_unsigned_neg_one).reducesTo ()
 
 end cast_signed
+end

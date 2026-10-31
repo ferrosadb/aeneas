@@ -202,3 +202,4 @@ def conditional_with_indirection_2 (b0 : Bool) : Result Unit := do
   conditional_with_indirection_2_loop (some (X.mk none)) (fun o => o) b0
 
 end rust_borrow_check_issues
+end

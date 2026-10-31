@@ -38,3 +38,4 @@ def use_as_mut
   coreconvertAsMutInst.as_mut x
 
 end as_mut
+end

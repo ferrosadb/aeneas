@@ -32,3 +32,4 @@ def match_u32 (x : Std.U32) : Result Std.U32 := do
   | _ => ok 2#u32
 
 end switch_test
+end

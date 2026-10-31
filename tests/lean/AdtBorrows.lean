@@ -398,3 +398,4 @@ def wrap_mut_in_option
   ok (some x, back)
 
 end adt_borrows
+end

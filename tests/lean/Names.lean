@@ -29,3 +29,4 @@ structure Struct where
   «name» : String
 
 end names
+end

@@ -60,3 +60,4 @@ def use_deref_mut_vec
   ok (alloc.vec.Vec.deref_mut x)
 
 end deref
+end

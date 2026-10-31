@@ -971,3 +971,4 @@ def test_rev_empty_slice : Result Unit := do
 #guard (test_rev_empty_slice).reducesTo ()
 
 end iter_adapters
+end

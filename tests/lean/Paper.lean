@@ -129,3 +129,4 @@ def call_choose (p : (Std.U32 × Std.U32)) : Result Std.U32 := do
   ok px1
 
 end paper
+end

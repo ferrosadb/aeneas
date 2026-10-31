@@ -48,3 +48,4 @@ def from_elem
   alloc.vec.from_elem corecloneCloneInst x n
 
 end vec
+end

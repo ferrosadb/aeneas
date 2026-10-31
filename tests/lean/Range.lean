@@ -40,3 +40,4 @@ def use_range_to (s : Slice Bool) : Result Unit := do
   ok ()
 
 end range
+end

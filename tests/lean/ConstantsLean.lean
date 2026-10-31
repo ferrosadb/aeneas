@@ -219,3 +219,4 @@ def read_trait_static_ref
   HasStaticRefInst.C
 
 end constants_lean
+end

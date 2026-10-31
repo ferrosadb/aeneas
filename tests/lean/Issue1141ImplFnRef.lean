@@ -33,3 +33,4 @@ def f
   ok ()
 
 end issue_1141_impl_fn_ref
+end

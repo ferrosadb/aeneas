@@ -32,3 +32,4 @@ namespace issue_1250_anonymous_const
 @[global_simps, irreducible] def __1 : Unit := ()
 
 end issue_1250_anonymous_const
+end

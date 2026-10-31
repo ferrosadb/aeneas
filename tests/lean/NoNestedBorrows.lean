@@ -655,3 +655,4 @@ def ExpandSimpliy.check_expand_simplify_symb2
   else ok x
 
 end no_nested_borrows
+end

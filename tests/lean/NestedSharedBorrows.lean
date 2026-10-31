@@ -155,3 +155,4 @@ def shared_reborrow_from_input_test : Result Unit := do
 #guard (shared_reborrow_from_input_test).reducesTo ()
 
 end nested_shared_borrows
+end

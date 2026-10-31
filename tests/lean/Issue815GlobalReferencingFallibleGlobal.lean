@@ -33,3 +33,4 @@ namespace issue_815_global_referencing_fallible_global
 @[global_simps, irreducible] def OUTER : Result Std.U32 := INNER
 
 end issue_815_global_referencing_fallible_global
+end

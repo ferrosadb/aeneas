@@ -90,3 +90,4 @@ def from_vec {T : Type _} (x : alloc.vec.Vec T) : Result (Slice T) := do
   alloc.vec.FromBoxSliceVec.from x
 
 end slices
+end

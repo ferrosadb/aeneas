@@ -93,3 +93,4 @@ def AlertLevelU8.Insts.CoreCmpPartialEqAlertLevelU8 : core.cmp.PartialEq
 }
 
 end discriminant
+end

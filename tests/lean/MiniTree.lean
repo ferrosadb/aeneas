@@ -57,3 +57,4 @@ def Tree.explore (self : Tree) : Result Unit := do
   Tree.explore_loop self.root
 
 end mini_tree
+end

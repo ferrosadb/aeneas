@@ -1176,3 +1176,4 @@ def write_static_ref
   ok (i, back)
 
 end static
+end

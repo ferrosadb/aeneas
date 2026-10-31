@@ -257,3 +257,4 @@ def array_shared_borrow_loop2
   array_shared_borrow_loop2_loop b a
 
 end loops_adts
+end

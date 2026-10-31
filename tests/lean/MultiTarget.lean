@@ -139,3 +139,4 @@ def «Fooaarch64-apple-darwin».f
   ok ()
 
 end multi_target
+end

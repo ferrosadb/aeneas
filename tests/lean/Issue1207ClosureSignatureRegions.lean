@@ -158,3 +158,4 @@ def nested.closure.Insts.CoreOpsFunctionFnTupleU8.call
   ok c
 
 end issue_1207_closure_signature_regions
+end

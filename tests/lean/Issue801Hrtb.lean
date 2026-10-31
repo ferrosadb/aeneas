@@ -34,3 +34,4 @@ def test {P : Type _} (TPSharedU8Inst : T P Std.U8) : Result Std.U8 := do
   TPSharedU8Inst.dummy
 
 end issue_801_hrtb
+end

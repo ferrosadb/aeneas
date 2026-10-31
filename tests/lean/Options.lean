@@ -345,3 +345,4 @@ def test_result_unwrap_or_err : Result Unit := do
 #guard (test_result_unwrap_or_err).reducesTo ()
 
 end options
+end

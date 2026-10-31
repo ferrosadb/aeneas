@@ -69,3 +69,4 @@ def to_bytes
   to_bytes_loop { start := 0#usize, «end» := 16#usize } x bytes
 
 end issue_807_missing_symbolic_value
+end

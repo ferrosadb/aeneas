@@ -66,3 +66,4 @@ def first_nonzero (xs : Slice Std.U8) : Result Std.Usize := do
   first_nonzero_loop { start := 0#usize, «end» := i } xs idx
 
 end issue_1206_loop_break
+end

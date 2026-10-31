@@ -646,3 +646,4 @@ def use_foo2
   ok (Foo.FOO T TraitInst)
 
 end traits
+end

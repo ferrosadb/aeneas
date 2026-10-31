@@ -523,3 +523,4 @@ def zip_iter (a : Slice Std.U8) (b : Slice Std.U8) : Result Unit := do
   zip_iter_loop iter
 
 end iterators
+end

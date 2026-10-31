@@ -462,3 +462,4 @@ def pseudo_random {T : Type _} (HashInst : Hash T) : Result Std.U32 := do
   pseudo_random_loop HashInst 0#u32
 
 end tutorial
+end

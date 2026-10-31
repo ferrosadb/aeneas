@@ -58,3 +58,4 @@ def iter_array : Result Unit := do
   iter_array_loop iter 0#i32
 
 end iterators_array
+end

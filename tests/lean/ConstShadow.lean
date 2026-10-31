@@ -64,3 +64,4 @@ def use_has_const
   ok (arr, n)
 
 end const_shadow
+end

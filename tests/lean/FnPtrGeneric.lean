@@ -188,3 +188,4 @@ def use_vec (x : Std.U8) : Result Std.U8 := do
   apply P.Insts.CoreOpsFunctionFnTupleU8U8 f x
 
 end fn_ptr_generic
+end

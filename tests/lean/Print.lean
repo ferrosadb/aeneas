@@ -30,3 +30,4 @@ def call_println : Result Unit := do
   std.io.stdio._print a
 
 end print
+end

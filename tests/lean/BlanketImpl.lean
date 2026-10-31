@@ -46,3 +46,4 @@ def Trait2.Blanket {T : Type _} (Trait1Inst : Trait1 T) : Trait2 T := {
 }
 
 end blanket_impl
+end

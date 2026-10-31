@@ -54,3 +54,4 @@ def U32.Insts.Builtin_autoSuperPointee : SuperPointee Std.U32 := {
 }
 
 end builtin_auto
+end

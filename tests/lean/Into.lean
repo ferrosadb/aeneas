@@ -37,3 +37,4 @@ def slice_to_array1 (s : Slice Std.U8) : Result (Array Std.U8 32#usize) := do
     "Expected a slice of length 32")
 
 end into
+end

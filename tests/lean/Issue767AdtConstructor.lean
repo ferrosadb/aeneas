@@ -104,3 +104,4 @@ def test_enum_constructor : Result Unit := do
 #guard (test_enum_constructor).reducesTo ()
 
 end issue_767_adt_constructor
+end

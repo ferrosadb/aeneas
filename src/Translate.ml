@@ -1589,7 +1589,10 @@ let extract_file (config : gen_config) (ctx : gen_ctx) (fi : extract_file_info)
   (* Close the module *)
   (match Config.backend () with
   | FStar -> ()
-  | Lean -> if fi.in_namespace then Printf.fprintf out "end %s\n" fi.namespace
+  | Lean ->
+      if fi.in_namespace then Printf.fprintf out "end %s\n" fi.namespace;
+      (* The section opened in the header must be closed, and after the namespace. *)
+      if fi.noncomputable then Printf.fprintf out "end\n"
   | HOL4 -> Printf.fprintf out "val _ = export_theory ()\n"
   | Coq -> Printf.fprintf out "End %s.\n" fi.module_name);
 

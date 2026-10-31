@@ -105,3 +105,4 @@ def dyn_closure.closure.Insts.CoreOpsFunctionFnTupleU32U32.call
   ok tupled_args
 
 end dyn
+end
