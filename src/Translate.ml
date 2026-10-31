@@ -1219,12 +1219,19 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
                ^ String.concat "\n" decls);
             (* We still extract something so that the user can look at it and
              eventually fix it *)
-            (* TODO: update to extract groups *)
-            List.iter
-              (fun id ->
-                export_trait_decl_group id;
-                export_trait_decl_group_extra_info id)
-              ids)
+            (* Lean has no forward references, so a group whose declarations mention each other
+               only elaborates inside a [mutual] block, where each may refer to the others. *)
+            let mutual = Config.backend () = Lean in
+            if mutual then (
+              Format.pp_print_string fmt "mutual";
+              Format.pp_print_break fmt 0 0);
+            List.iter (fun id -> export_trait_decl_group id) ids;
+            if mutual then (
+              Format.pp_print_break fmt 0 0;
+              Format.pp_print_string fmt "end";
+              Format.pp_print_break fmt 0 0);
+            (* Extra info is not part of the recursive group, so it goes after the block. *)
+            List.iter (fun id -> export_trait_decl_group_extra_info id) ids)
     | TraitDeclGroup (NonRecGroup id) ->
         (* TODO: update to extract groups *)
         if config.extract_trait_decls && config.extract_transparent then (

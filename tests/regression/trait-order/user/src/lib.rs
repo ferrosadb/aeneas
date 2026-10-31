@@ -1,5 +1,7 @@
-//! Uses dep's traits so charon emits their declarations as external.
+//! Uses only `Decode`; `Reader` is reachable only through it, so its declaration is a *transitive*
+//! external item rather than something this crate names directly -- ferrosa's position with
+//! respect to serde's `Expected`/`Error`/`Deserializer`.
 
-pub fn read_it<R: dep::Reader>(r: &R) -> u32 {
-    r.read()
+pub fn decode_it<R: dep::Reader, D: dep::Decode>(r: &R) -> D {
+    D::decode(r)
 }
