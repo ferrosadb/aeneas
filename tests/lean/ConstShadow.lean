@@ -18,11 +18,14 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace const_shadow
 
 /-- Trait declaration: [const_shadow::HasConst]
     Source: 'tests/src/const-shadow.rs', lines 11:0-15:1 -/
-structure HasConst (Self : Type _) (N1 : Std.Usize) where
+structure HasConst (Self : Type) (N1 : Std.Usize) where
   N : Result Std.Usize
   get : Self → Result (Array Std.U8 N1)
 

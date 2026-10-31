@@ -22,6 +22,8 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace loop_shared_borrow_proj
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [alloc::vec::{impl core::iter::traits::collect::IntoIterator<&'a T, core::slice::iter::Iter<'a, T>> for &'a alloc::vec::Vec<T>}::into_iter]:
     Source: '/rustc/library/alloc/src/vec/mod.rs', lines 4088:4-4088:40
@@ -29,9 +31,10 @@ namespace loop_shared_borrow_proj
     Visibility: public -/
 @[rust_fun
   "alloc::vec::{core::iter::traits::collect::IntoIterator<&'a alloc::vec::Vec<@T>, &'a @T, core::slice::iter::Iter<'a, @T>>}::into_iter"]
-axiom SharedAVec.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
+def SharedAVec.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
   {T : Type _} (A : Type _) :
   alloc.vec.Vec T → Result (core.slice.iter.Iter T)
+  := sorry
 
 /-- [loop_shared_borrow_proj::Cap]
     Source: 'tests/src/loop-shared-borrow-proj.rs', lines 7:0-9:1
@@ -42,17 +45,17 @@ structure Cap where
 /-- [loop_shared_borrow_proj::Guard]
     Source: 'tests/src/loop-shared-borrow-proj.rs', lines 15:0-17:1
     Visibility: public -/
-axiom Guard : Type
+def Guard : Type := sorry
 
 /-- [loop_shared_borrow_proj::wrap]:
     Source: 'tests/src/loop-shared-borrow-proj.rs', lines 21:0-23:1
     Visibility: public -/
-axiom wrap : Cap → Result Guard
+def wrap : Cap → Result Guard := sorry
 
 /-- [loop_shared_borrow_proj::{loop_shared_borrow_proj::Guard<'a>}::get]:
     Source: 'tests/src/loop-shared-borrow-proj.rs', lines 28:4-30:5
     Visibility: public -/
-axiom Guard.get : Guard → Result Cap
+def Guard.get : Guard → Result Cap := sorry
 
 /-- [loop_shared_borrow_proj::carve]: loop body 0:
     Source: 'tests/src/loop-shared-borrow-proj.rs', lines 35:4-41:1

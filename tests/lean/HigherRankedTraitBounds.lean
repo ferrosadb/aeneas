@@ -18,11 +18,14 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace higher_ranked_trait_bounds
 
 /-- Trait declaration: [higher_ranked_trait_bounds::RefTrait]
     Source: 'tests/src/higher_ranked_trait_bounds.rs', lines 4:0-6:1 -/
-structure RefTrait (Self : Type _) (X : Type _) where
+structure RefTrait (Self : Type) (X : Type) where
   get : Self → Result X
 
 /-- [higher_ranked_trait_bounds::use_higher_ranked_trait_bound]:

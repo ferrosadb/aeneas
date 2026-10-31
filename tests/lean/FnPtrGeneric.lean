@@ -28,7 +28,7 @@ namespace fn_ptr_generic
     Name pattern: [core::mem::maybe_uninit::MaybeUninit]
     Visibility: public -/
 @[rust_type "core::mem::maybe_uninit::MaybeUninit"]
-axiom core.mem.maybe_uninit.MaybeUninit (T : Type _) : Type
+def core.mem.maybe_uninit.MaybeUninit (T : Type _) : Type := sorry
 
 /-- [fn_ptr_generic::incr]:
     Source: 'tests/src/fn_ptr_generic.rs', lines 7:0-9:1 -/
@@ -110,7 +110,7 @@ def get_x {T : Type _} (h : Holder T) : Result T := do
 /-- Trait declaration: [fn_ptr_generic::HasOut]
     Source: 'tests/src/fn_ptr_generic.rs', lines 27:0-30:1
     Visibility: public -/
-structure HasOut (Self : Type _) (Self_Out : Type _) where
+structure HasOut (Self : Type) (Self_Out : Type) where
   get : Self → Result Self_Out
 
 /-- [fn_ptr_generic::Wrap]

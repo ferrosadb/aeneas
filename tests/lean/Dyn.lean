@@ -18,11 +18,14 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace dyn
 
 /-- Trait declaration: [dyn::Trait]
     Source: 'tests/src/dyn.rs', lines 3:0-5:1 -/
-structure Trait (Self : Type _) where
+structure Trait (Self : Type) where
   get : Self → Result Std.U32
 
 /-- [dyn::{impl dyn::Trait for u32}::get]:
@@ -63,7 +66,7 @@ def mk_trait (b : Bool) : Result (Dyn (fun _dyn => Trait _dyn)) := do
 
 /-- Trait declaration: [dyn::Into]
     Source: 'tests/src/dyn.rs', lines 31:0-33:1 -/
-structure Into (Self : Type _) (T : Type _) where
+structure Into (Self : Type) (T : Type) where
   into : Self → Result T
 
 /-- [dyn::mk_into]:
@@ -79,7 +82,7 @@ def mk_into
 
 /-- Trait declaration: [dyn::Trivial]
     Source: 'tests/src/dyn.rs', lines 48:0-48:16 -/
-structure Trivial (Self : Type _) where
+structure Trivial (Self : Type) where
 
 /-- [dyn::dyn_closure::{closure}]
     Source: 'tests/src/dyn.rs', lines 51:12-51:33 -/

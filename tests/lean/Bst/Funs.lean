@@ -19,74 +19,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace bst
-
-/-- [bst::{bst::TreeSet<T>}::new]:
-    Source: 'src/bst.rs', lines 28:4-30:5
-    Visibility: public -/
-def TreeSet.new {T : Type _} (OrdInst : Ord T) : Result (TreeSet T) := do
-  ok { root := none }
-
-/-- [bst::{bst::TreeSet<T>}::find]: loop 0:
-    Source: 'src/bst.rs', lines 35:8-44:5
-    Visibility: public -/
-@[rust_loop]
-def TreeSet.find_loop
-  {T : Type _} (OrdInst : Ord T) (value : T) (current_tree : Option (Node T)) :
-  Result Bool
-  := do
-  match current_tree with
-  | none => ok false
-  | some current_node =>
-    let o ← OrdInst.cmp current_node.value value
-    match o with
-    | Ordering.Less => TreeSet.find_loop OrdInst value current_node.right
-    | Ordering.Equal => ok true
-    | Ordering.Greater => TreeSet.find_loop OrdInst value current_node.left
-partial_fixpoint
-
-/-- [bst::{bst::TreeSet<T>}::find]:
-    Source: 'src/bst.rs', lines 32:4-44:5
-    Visibility: public -/
-@[reducible]
-def TreeSet.find
-  {T : Type _} (OrdInst : Ord T) (self : TreeSet T) (value : T) :
-  Result Bool
-  := do
-  TreeSet.find_loop OrdInst value self.root
-
-/-- [bst::{bst::TreeSet<T>}::insert]: loop 0:
-    Source: 'src/bst.rs', lines 48:8-63:5
-    Visibility: public -/
-@[rust_loop]
-def TreeSet.insert_loop
-  {T : Type _} (OrdInst : Ord T) (value : T) (current_tree : Option (Node T)) :
-  Result (Bool × (Option (Node T)))
-  := do
-  match current_tree with
-  | none => ok (true, some (Node.mk value none none))
-  | some current_node =>
-    let o ← OrdInst.cmp current_node.value value
-    match o with
-    | Ordering.Less =>
-      let (b, back) ← TreeSet.insert_loop OrdInst value current_node.right
-      let back1 := some (Node.mk current_node.value current_node.left back)
-      ok (b, back1)
-    | Ordering.Equal => ok (false, current_tree)
-    | Ordering.Greater =>
-      let (b, back) ← TreeSet.insert_loop OrdInst value current_node.left
-      let back1 := some (Node.mk current_node.value back current_node.right)
-      ok (b, back1)
-partial_fixpoint
-
-/-- [bst::{bst::TreeSet<T>}::insert]:
-    Source: 'src/bst.rs', lines 45:4-63:5
-    Visibility: public -/
-def TreeSet.insert
-  {T : Type _} (OrdInst : Ord T) (self : TreeSet T) (value : T) :
-  Result (Bool × (TreeSet T))
-  := do
-  let (b, o) ← TreeSet.insert_loop OrdInst value self.root
-  ok (b, { root := o })
 
 end bst

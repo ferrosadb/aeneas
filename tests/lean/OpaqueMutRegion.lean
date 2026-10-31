@@ -25,7 +25,7 @@ namespace opaque_mut_region
 
 /-- [opaque_mut_region::Wrapper]
     Source: 'tests/src/opaque-mut-region.rs', lines 6:0-6:33 -/
-axiom Wrapper (T : Type _) : Type
+def Wrapper (T : Type _) : Type := sorry
 
 /-- [opaque_mut_region::{opaque_mut_region::Wrapper<'a, T>}::id]:
     Source: 'tests/src/opaque-mut-region.rs', lines 9:4-11:5 -/
@@ -38,7 +38,7 @@ def Wrapper.id
 /-- [opaque_mut_region::WrapperRaw]
     Source: 'tests/src/opaque-mut-region.rs', lines 15:0-19:1
     Visibility: public -/
-axiom WrapperRaw (T : Type _) : Type
+def WrapperRaw (T : Type _) : Type := sorry
 
 /-- [opaque_mut_region::{opaque_mut_region::WrapperRaw<'a, T>}::id]:
     Source: 'tests/src/opaque-mut-region.rs', lines 22:4-24:5 -/

@@ -18,12 +18,15 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace rename_attribute
 
 /-- Trait declaration: [rename_attribute::BoolTrait]
     Source: 'tests/src/rename_attribute.rs', lines 10:0-20:1
     Visibility: public -/
-structure BoolTest (Self : Type _) where
+structure BoolTest (Self : Type) where
   getTest : Self → Result Bool
   retTest : Self → Result Bool
 

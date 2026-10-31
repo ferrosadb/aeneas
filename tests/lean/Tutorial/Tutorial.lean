@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace tutorial
 
 /-- [tutorial::choose]:
@@ -163,7 +166,7 @@ end
 /-- Trait declaration: [tutorial::Counter]
     Source: 'src/lib.rs', lines 105:0-107:1
     Visibility: public -/
-structure Counter (Self : Type _) where
+structure Counter (Self : Type) where
   incr : Self → Result (Std.Usize × Self)
 
 /-- [tutorial::{impl tutorial::Counter for usize}::incr]:
@@ -436,7 +439,7 @@ def add
 
 /-- Trait declaration: [tutorial::Hash]
     Source: 'src/lib.rs', lines 250:0-252:1 -/
-structure Hash (Self : Type _) where
+structure Hash (Self : Type) where
   hash : Std.U32 → Result Std.U32
 
 /-- [tutorial::pseudo_random]: loop 0:

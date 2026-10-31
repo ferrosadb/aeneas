@@ -22,13 +22,14 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace issue_765_hrtb_conditional_negate
+def ext.ConditionallyNegatable (Self : Type _) : Type := sorry
 
 /-- Trait declaration: [core::ops::arith::Neg]
     Source: '/rustc/library/core/src/ops/arith.rs', lines 690:0-690:19
     Name pattern: [core::ops::arith::Neg]
     Visibility: public -/
 @[rust_trait "core::ops::arith::Neg"]
-structure core.ops.arith.Neg (Self : Type _) (Self_Output : Type _) where
+structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
   neg : Self → Result Self_Output
 
 /-- [issue_765_hrtb_conditional_negate::Choice]
@@ -60,7 +61,7 @@ def Choice.Insts.CoreMarkerCopy : core.marker.Copy Choice := {
 /-- Trait declaration: [issue_765_hrtb_conditional_negate::ConditionallySelectable]
     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 15:0-21:1
     Visibility: public -/
-structure ConditionallySelectable (Self : Type _) where
+structure ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   conditional_select : Self → Self → Choice → Result Self
   conditional_assign : Self → Self → Choice → Result Self
@@ -138,15 +139,16 @@ def SharedAF.Insts.CoreOpsArithNegF : core.ops.arith.Neg F F := {
 /-- [issue_765_hrtb_conditional_negate::ext::{impl issue_765_hrtb_conditional_negate::ext::ConditionallyNegatable for T}::conditional_negate]:
     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 54:8-57:9
     Visibility: public -/
-axiom ext.ConditionallyNegatable.Blanket.conditional_negate
+def ext.ConditionallyNegatable.Blanket.conditional_negate
   {T : Type _} (ConditionallySelectableInst : ConditionallySelectable T)
   (coreopsarithNegShared0TTInst : core.ops.arith.Neg T T) :
   T → Choice → Result T
+  := sorry
 
 /-- Trait declaration: [issue_765_hrtb_conditional_negate::local::ConditionallyNegatable]
     Source: 'tests/src/issue-765-hrtb-conditional-negate.rs', lines 66:4-68:5
     Visibility: public -/
-structure local.ConditionallyNegatable (Self : Type _) where
+structure local.ConditionallyNegatable (Self : Type) where
   conditional_negate : Self → Choice → Result Self
 
 /-- [issue_765_hrtb_conditional_negate::local::{impl issue_765_hrtb_conditional_negate::local::ConditionallyNegatable for T}::conditional_negate]:

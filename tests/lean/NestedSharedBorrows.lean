@@ -29,9 +29,10 @@ namespace nested_shared_borrows
     Visibility: public -/
 @[rust_fun
   "core::option::{core::ops::try_trait::Try<core::option::Option<@T>>}::branch"]
-axiom core.option.Option.Insts.CoreOpsTry_traitTry.branch
+def core.option.Option.Insts.CoreOpsTry_traitTry.branch
   {T : Type _} :
   Option T → Result (core.ops.control_flow.ControlFlow (Option Never) T)
+  := sorry
 
 /-- [core::option::{impl core::ops::try_trait::FromResidual<core::option::Option<!>> for core::option::Option<T>}::from_residual]:
     Source: '/rustc/library/core/src/option.rs', lines 2889:4-2889:49
@@ -39,9 +40,9 @@ axiom core.option.Option.Insts.CoreOpsTry_traitTry.branch
     Visibility: public -/
 @[rust_fun
   "core::option::{core::ops::try_trait::FromResidual<core::option::Option<@T>, core::option::Option<!>>}::from_residual"]
-axiom
+def
   core.option.Option.Insts.CoreOpsTry_traitFromResidualOptionNever.from_residual
-  (T : Type _) : Option Never → Result (Option T)
+  (T : Type _) : Option Never → Result (Option T) := sorry
 
 /-- [nested_shared_borrows::do_option]:
     Source: 'tests/src/nested-shared-borrows.rs', lines 15:0-17:1 -/

@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1436_loop_generics_rec
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_1436_loop_generics_rec::sum]: loop 0:
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 16:4-18:5
@@ -149,13 +154,13 @@ def count
 /-- Trait declaration: [issue_1436_loop_generics_rec::Tr]
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 61:0-63:1
     Visibility: public -/
-structure Tr (Self : Type _) where
+structure Tr (Self : Type) where
   f : Self → Result Std.U32
 
 /-- Trait declaration: [issue_1436_loop_generics_rec::Wrap]
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 66:0-66:24
     Visibility: public -/
-structure Wrap (Self : Type _) (T : Type _) where
+structure Wrap (Self : Type) (T : Type) where
   TrInst : Tr Self
 
 /-- [issue_1436_loop_generics_rec::loop_wrap]: loop 0:
@@ -189,7 +194,7 @@ def loop_wrap
 /-- Trait declaration: [issue_1436_loop_generics_rec::HasN]
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 80:0-80:37
     Visibility: public -/
-structure HasN (Self : Type _) (N : Std.Usize) where
+structure HasN (Self : Type) (N : Std.Usize) where
   TrInst : Tr Self
 
 /-- [issue_1436_loop_generics_rec::loop_const_generic]: loop 0:
@@ -223,7 +228,7 @@ def loop_const_generic
 /-- Trait declaration: [issue_1436_loop_generics_rec::Wrap2]
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 95:0-95:30
     Visibility: public -/
-structure Wrap2 (Self : Type _) (T : Type _) where
+structure Wrap2 (Self : Type) (T : Type) where
   WrapInst : Wrap Self T
 
 /-- [issue_1436_loop_generics_rec::loop_wrap2]: loop 0:

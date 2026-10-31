@@ -18,11 +18,14 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace constants_lean
 
 /-- Trait declaration: [constants_lean::Params]
     Source: 'tests/src/constants-lean.rs', lines 3:0-6:1 -/
-structure Params (Self : Type _) where
+structure Params (Self : Type) where
   N : Result Std.Usize
   M : Result Std.Usize
 
@@ -59,7 +62,7 @@ def Wrapper.NM (N1 : Std.Usize) (M1 : Std.Usize) : Result Std.Usize := N1 * M1
 
 /-- Trait declaration: [constants_lean::Trait]
     Source: 'tests/src/constants-lean.rs', lines 22:0-24:1 -/
-structure Trait (Self : Type _) where
+structure Trait (Self : Type) where
   NM : Result Std.Usize
 
 /-- [constants_lean::{impl constants_lean::Trait for constants_lean::Wrapper<N, M>}::NM]
@@ -79,7 +82,7 @@ def Wrapper.Insts.Constants_leanTrait (N1 : Std.Usize) (M1 : Std.Usize) : Trait
 
 /-- Trait declaration: [constants_lean::Trait1]
     Source: 'tests/src/constants-lean.rs', lines 30:0-34:1 -/
-structure Trait1 (Self : Type _) where
+structure Trait1 (Self : Type) where
   N : Result Std.Usize
   M : Result Std.Usize
   NM : Result Std.Usize
@@ -114,7 +117,7 @@ impl_def Bool.Insts.Constants_leanTrait1 : Trait1 Bool := {
 
 /-- Trait declaration: [constants_lean::Params1]
     Source: 'tests/src/constants-lean.rs', lines 41:0-47:1 -/
-structure Params1 (Self : Type _) where
+structure Params1 (Self : Type) where
   N : Result Std.Usize
   LOGQ : Result Std.Usize
   PACKED_LEN : Result Std.Usize
@@ -205,7 +208,7 @@ def get_static_str_name : Result Str := do
 /-- Trait declaration: [constants_lean::HasStaticRef]
     Source: 'tests/src/constants-lean.rs', lines 88:0-90:1
     Visibility: public -/
-structure HasStaticRef (Self : Type _) where
+structure HasStaticRef (Self : Type) where
   C : Result StaticRef
 
 /-- [constants_lean::read_trait_static_ref]:
