@@ -1412,8 +1412,8 @@ let type_decl_kind_to_qualif (span : Meta.span) (kind : decl_kind)
           | Some Struct -> Some "structure"
           | _ -> Some "inductive")
       | SingleRec | MutRecFirst | MutRecInner | MutRecLast -> Some "inductive"
-      | Builtin -> Some "axiom"
-      | Declared -> Some "axiom")
+      | Builtin -> Some "def"
+      | Declared -> Some "def")
   | HOL4 -> None
 
 (** Compute the qualified for a function definition/declaration.
@@ -1448,8 +1448,8 @@ let fun_decl_kind_to_qualif (kind : decl_kind) : string option =
       | MutRecFirst -> Some "def"
       | MutRecInner -> Some "def"
       | MutRecLast -> Some "def"
-      | Builtin -> Some "axiom"
-      | Declared -> Some "axiom")
+      | Builtin -> Some "def"
+      | Declared -> Some "def")
   | HOL4 -> None
 
 (** Compute the qualifier to add after the definition. *)

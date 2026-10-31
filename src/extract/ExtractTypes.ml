@@ -1644,7 +1644,11 @@ let extract_type_decl_gen (ctx : extraction_ctx) (fmt : F.formatter)
       F.pp_print_space fmt ();
       F.pp_print_string fmt ":");
     F.pp_print_space fmt ();
-    F.pp_print_string fmt (type_keyword ~poly:false span));
+    F.pp_print_string fmt (type_keyword ~poly:false span);
+    (* Lean only: a type nobody models is a hole, not an axiom. *)
+    if backend () = Lean then (
+      F.pp_print_space fmt ();
+      F.pp_print_string fmt ":= sorry"));
   (* Close the box for "type TYPE_NAME (TYPE_PARAMS) =" *)
   F.pp_close_box fmt ();
   (if extract_body then

@@ -2262,7 +2262,13 @@ let extract_fun_decl_gen (ctx : extraction_ctx) (fmt : F.formatter)
     F.pp_close_box fmt ()
   in
   (* Print the "=" *)
-  if not is_opaque then (
+  if is_opaque then (
+    (* Lean only: a declaration nobody models is emitted as a hole rather than as an axiom, so that a
+       completeness check can find it and a model can replace it. *)
+    if backend () = Lean then (
+      F.pp_print_space fmt ();
+      F.pp_print_string fmt ":= sorry"))
+  else (
     F.pp_print_space fmt ();
     let eq =
       match backend () with
