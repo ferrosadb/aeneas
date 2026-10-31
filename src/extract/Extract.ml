@@ -3423,11 +3423,17 @@ let extract_trait_impl_method_items_aux (ctx : extraction_ctx)
 
   extract_trait_impl_item ctx fmt fun_name ty
 
+(* Set when printing an item of a trait implementation fails *)
+let trait_impl_body_failed = ref false
+
 let extract_trait_impl_method_items (ctx : extraction_ctx) (fmt : F.formatter)
     (impl : trait_impl) (method_id : trait_method_id) (fn : fun_decl_ref binder)
     : unit =
   try extract_trait_impl_method_items_aux ctx fmt impl method_id fn
   with CFailure _ ->
+    (* The caller replaces an incomplete structure literal by a bare [sorry]; it needs to
+       know that this item did not make it. *)
+    trait_impl_body_failed := true;
     F.pp_print_space fmt ();
     extract_admit fmt
 
@@ -3565,7 +3571,19 @@ let extract_trait_impl (ctx : extraction_ctx) (fmt : F.formatter)
     (* Outer box *)
     F.pp_close_box fmt ())
   else (
-    if backend () = Lean then F.pp_print_string fmt ":= {"
+    (* On Lean, render the body through a buffer. If printing an item records an error, the
+       literal is incomplete, and Lean reads [{ sorry }] as singleton notation: the file then
+       fails with a [Singleton] synthesis error naming neither the impl nor the cause. In that
+       case the whole body becomes a bare [sorry], which elaborates at any type. *)
+    let outer_fmt = fmt in
+    let buffered = backend () = Lean in
+    let body_buf = Buffer.create 512 in
+    let fmt =
+      if buffered then F.formatter_of_buffer body_buf else outer_fmt
+    in
+    if buffered then (
+      trait_impl_body_failed := false;
+      F.pp_print_string fmt "{" )
     else if backend () = Coq then F.pp_print_string fmt ":= {|"
     else F.pp_print_string fmt "= {";
 
@@ -3685,7 +3703,14 @@ let extract_trait_impl (ctx : extraction_ctx) (fmt : F.formatter)
       F.pp_print_string fmt "|}.")
     else if (not (backend () = FStar)) || not is_empty then (
       F.pp_print_space fmt ();
-      F.pp_print_string fmt "}"));
+      F.pp_print_string fmt "}");
+    if buffered then (
+      F.pp_print_flush fmt ();
+      if !trait_impl_body_failed then
+        F.pp_print_string outer_fmt ":= sorry"
+      else (
+        F.pp_print_string outer_fmt ":= ";
+        F.pp_print_string outer_fmt (Buffer.contents body_buf))));
   F.pp_close_box fmt ();
   (* Add breaks to insert new lines between definitions *)
   F.pp_print_break fmt 0 0
