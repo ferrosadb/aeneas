@@ -2,8 +2,8 @@
 
    [ty_regions] answers one question: which FREE regions does this type mention. A prepass
    rewrites body and variable regions to [RErased] (PrePasses.ml), so after prepasses a type may
-   legitimately mention a region that is not free. Aborting on those lost two crates outright --
-   ferrosa-jsonb and ferrosa-cql -- while answering a question the caller never asked.
+   legitimately mention a region that is not free. Aborting on those answers a question the
+   caller never asked, and takes the whole run with it.
 
    The three outcomes are pinned here together, because the fix must widen the accepted input
    without widening the accepted inconsistency: [RVar (Bound _)] reaching a free-region collector
