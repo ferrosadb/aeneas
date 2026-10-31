@@ -85,3 +85,6 @@ nohup.out
 # someone means to commit under a test directory.
 /*.llbc
 
+
+# Aeneas output for the repro crate: generated, so not tracked (see repro-dyn-error/README.md).
+/repro-dyn-error/repro-dyn-error/*.lean

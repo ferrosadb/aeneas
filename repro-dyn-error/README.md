@@ -19,7 +19,8 @@ error: failed to synthesize instance of type class
 
 ## Why that message is misleading
 
-The generated file contains
+The file aeneas writes is not checked in — it is generated output, and the first line of it says so.
+Regenerate it with the three commands above; what follows is what it contains.
 
 ```lean
 @[reducible, rust_trait_impl "core::convert::From<Box<@>, &'0 str>"]
@@ -81,3 +82,17 @@ from a narrowed extraction the same way `core::convert::From` does.
 ## Observed on
 
 charon `nightly-2026.10.30`, aeneas `nightly-2026.10.30-de16f3c`, Lean `v4.35.0`.
+
+## Regenerating
+
+```
+charon cargo --preset=aeneas --start-from 'repro_dyn_error::*' -- --lib
+aeneas -backend lean repro_dyn_error.llbc
+lake env lean ReproDynError.lean
+```
+
+The committed `repro_dyn_error.llbc` is the input, so the second command needs no Rust toolchain;
+the first is there for the record and to show how the narrowing was produced. As of
+`d966749` the third command still fails: `core.convert.From` is still referenced without being
+declared, `{ sorry }` is still emitted as a structure literal, and `check` still carries
+`sorry /- Could not find: type name: repro_dyn_error::Error -/`.
