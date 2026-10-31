@@ -1546,7 +1546,10 @@ let extract_file (config : gen_config) (ctx : gen_ctx) (fi : extract_file_info)
          /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI \
          option -/\n";
       Printf.fprintf out "set_option maxRecDepth %d\n" !Config.max_recdepth;
-      (* Declare the definitions as being noncomputable if needs be *)
+      (* Declare the definitions as noncomputable unless the user asked for computable output.
+         Whether a definition elaborates as computable cannot be decided from the crate's opaque
+         declarations alone: translating a match on a Prop-inductive introduces a [ctorElim],
+         which makes an otherwise computable definition noncomputable by itself. *)
       if fi.noncomputable then
         Printf.fprintf out
           "\n\
@@ -2029,7 +2032,6 @@ let extract_translated_crate (filename : string) (dest_dir : string)
   let has_opaque_types, has_opaque_funs =
     crate_has_opaque_non_builtin_decls ctx true
   in
-  let has_opaque = has_opaque_types || has_opaque_funs in
 
   (* Extract one or several files, depending on the configuration *)
   (if !Config.split_files then (
@@ -2099,7 +2101,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
              custom_msg;
              custom_imports = [];
              custom_includes = [];
-             noncomputable = false;
+             noncomputable = not !Config.all_computable;
            }
          in
          extract_file opaque_config ctx file_info;
@@ -2139,7 +2141,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
          custom_msg = ": type definitions";
          custom_imports = [];
          custom_includes = opaque_types_module;
-         noncomputable = false;
+         noncomputable = not !Config.all_computable;
        }
      in
      extract_file types_config ctx file_info;
@@ -2167,7 +2169,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
             custom_msg = ": templates for the decreases clauses";
             custom_imports = [ types_module ];
             custom_includes = [];
-            noncomputable = false;
+            noncomputable = not !Config.all_computable;
           }
         in
         extract_file template_clauses_config ctx file_info);
@@ -2222,7 +2224,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
              custom_msg;
              custom_imports = [];
              custom_includes = [ types_module ];
-             noncomputable = false;
+             noncomputable = not !Config.all_computable;
            }
          in
          extract_file opaque_config ctx file_info;
@@ -2263,7 +2265,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
          custom_imports = [];
          custom_includes =
            [ types_module ] @ opaque_funs_module @ clauses_module;
-         noncomputable = has_opaque && not !Config.all_computable;
+         noncomputable = not !Config.all_computable;
        }
      in
      extract_file fun_config ctx file_info)
@@ -2295,7 +2297,7 @@ let extract_translated_crate (filename : string) (dest_dir : string)
          custom_msg = "";
          custom_imports = [];
          custom_includes = [];
-         noncomputable = has_opaque && not !Config.all_computable;
+         noncomputable = not !Config.all_computable;
        }
      in
      extract_file gen_config ctx file_info);
