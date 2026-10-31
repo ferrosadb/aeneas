@@ -2,7 +2,7 @@
  (name main)
  (public_name aeneas)
  (package aeneas)
- (libraries aeneas)
+ (libraries aeneas unix)
  (modes byte exe)
  (preprocess
   (pps
@@ -182,3 +182,14 @@
    -3-5@8-11-14-33-20-21-26-27-39
    -w
    -30)))
+
+;; Unit tests: `dune build @runtest` from src/.
+(executable
+ (name test_ty_regions)
+ (modules Test_ty_regions)
+ (libraries aeneas))
+
+(rule
+ (alias runtest)
+ (action
+  (run ./test_ty_regions.exe)))
