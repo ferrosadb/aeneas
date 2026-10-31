@@ -95,8 +95,13 @@ let ty_regions (ty : ty) : RegionId.Set.t =
     | RStatic -> ()
     | RLub _ -> [%craise_opt_span] None "Unexpected Lub region"
     | RErased | RBody _ ->
-        raise
-          (Failure "ty_regions shouldn't be called on erased or body regions")
+        (* Neither is a free region: an erased one has been erased, and a body region belongs to a
+           closure body rather than to this type's signature. Collecting *free* regions must skip
+           them, not abort the translation. Raising here lost two crates outright --
+           `ferrosa-jsonb` through `bottom_in_value` and `ferrosa-cql` through a dyn-trait
+           predicate -- for a question the caller does not ask ("which free regions does this
+           type mention?"). *)
+        ()
     | RVar (Bound _) ->
         raise (Failure "region_in_set shouldn't be called on bound regions")
     | RVar (Free id) -> s := RegionId.Set.add id !s
