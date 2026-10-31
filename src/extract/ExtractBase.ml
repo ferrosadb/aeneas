@@ -533,18 +533,28 @@ let int_name (int_ty : integer_type) : string =
   | Unsigned U128 -> Printf.sprintf u_format 128
 
 let float_name (float_ty : float_type) : string =
-  match (backend (), float_ty) with
-  (* Lean has no [F32]/[F64] names: printing them emits a type that exists nowhere in Aeneas/Std,
-     so any declaration mentioning it fails to elaborate ("contains universe level metavariables")
-     and every later reference to it reports unknownIdentifier. Lean's own binary32/binary64 are
-     [Float32] and [Float]. *)
-  | Lean, F32 -> "Float32"
-  | Lean, F64 -> "Float"
-  | (FStar | Coq | HOL4), F16 -> "f16"
-  | (FStar | Coq | HOL4), F32 -> "f32"
-  | (FStar | Coq | HOL4), F64 -> "f64"
-  | _, F16 -> "F16"
-  | _, F128 -> "F128"
+  (* Lean has no [F32]/[F64] types: printing those names emits a type that exists nowhere in
+     Aeneas/Std, so a declaration mentioning it fails to elaborate ("contains universe level
+     metavariables") and every later reference reports unknownIdentifier. Lean's binary32 and
+     binary64 are [Float32] and [Float].
+
+     The other three backends spell every width in lower case. Matching on [backend ()] alone and
+     then on the width keeps the two conventions from bleeding into each other -- an earlier
+     version of this matched on the pair, and its catch-all arm sent F128 to the non-Lean backends
+     as [F128]. *)
+  match backend () with
+  | Lean -> (
+      match float_ty with
+      | F16 -> "F16"
+      | F32 -> "Float32"
+      | F64 -> "Float"
+      | F128 -> "F128")
+  | FStar | Coq | HOL4 -> (
+      match float_ty with
+      | F16 -> "f16"
+      | F32 -> "f32"
+      | F64 -> "f64"
+      | F128 -> "f128")
 
 let scalar_name (ty : literal_type) : string =
   match ty with

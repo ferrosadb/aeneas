@@ -193,3 +193,13 @@
  (alias runtest)
  (action
   (run ./test_ty_regions.exe)))
+
+(executable
+ (name test_backend_names)
+ (modules Test_backend_names)
+ (libraries aeneas))
+
+(rule
+ (alias runtest)
+ (action
+  (run ./test_backend_names.exe)))
