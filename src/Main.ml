@@ -27,6 +27,38 @@ let _ =
  * TODO: run with OCAMLRUNPARAM=b=1? *)
 let () = Printexc.record_backtrace true
 
+(* Bound the major heap against live data.
+
+   Aeneas keeps the translated crate in memory until it writes the file, and threads one growing
+   context through every function, global and trait, so live data is inherently large -- but the
+   default OCaml collector lets the heap sit far above it: on a large real-world crate the heap
+   reached 19.6 GiB while live data was 3.5 GiB, and the process was killed for it. Measured on that
+   same input, `space_overhead = 20` held the ratio near 2.5x instead of 5.6x, which is the
+   difference between dying at a 12 GiB ceiling and finishing. The cost is more major collections,
+   paid in time rather than memory -- the right way round for a tool routinely run next to a
+   desktop. *)
+let () =
+  let ctrl = Gc.get () in
+  Gc.set { ctrl with space_overhead = 20 }
+
+(* Heap diagnostics, for deciding whether a run that dies of memory is holding live data or just
+   allocator high-water. Printed every 30s, on the usual terminate signals, and at exit: a run
+   killed by a cgroup ceiling or a timeout then still says which of the two it was. *)
+let () =
+  let report () =
+    Gc.print_stat stderr;
+    flush stderr
+  in
+  at_exit report;
+  Sys.set_signal Sys.sigterm (Sys.Signal_handle (fun _ -> report (); exit 1));
+  Sys.set_signal Sys.sigint (Sys.Signal_handle (fun _ -> report (); exit 1));
+  try
+    ignore
+      (Unix.setitimer Unix.ITIMER_REAL
+         { Unix.it_interval = 30.0; it_value = 30.0 });
+    Sys.set_signal Sys.sigalrm (Sys.Signal_handle (fun _ -> report ()))
+  with _ -> ()
+
 let usage =
   Printf.sprintf
     {|Aeneas: verification of Rust programs by translation to pure lambda calculus
