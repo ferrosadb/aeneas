@@ -80,3 +80,8 @@ nohup.out
 */.#*
 *.smt2
 .DS_Store
+
+# Charon output from a manual run at the repo root. Anchored, so it cannot hide a test fixture
+# someone means to commit under a test directory.
+/*.llbc
+
