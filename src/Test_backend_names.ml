@@ -10,7 +10,6 @@
    Run with `dune build @runtest` from src/. *)
 
 open Aeneas
-open Types
 open Values
 
 let failures = ref 0
@@ -34,29 +33,20 @@ let check (backend_name : string) (cases : (float_type * string) list) =
         | F128 -> "128"
       in
       expect
-        (Printf.sprintf "%s, F%s" (Config.backend_to_string (Config.backend ())) width)
+        (Printf.sprintf "%s, F%s"
+           (Config.backend_to_string (Config.backend ()))
+           width)
         expected
         (ExtractBase.float_name ty))
     cases
 
 let () =
   check "lean"
-    [
-      (F16, "F16");
-      (F32, "Float32");
-      (F64, "Float");
-      (F128, "F128");
-    ];
+    [ (F16, "F16"); (F32, "Float32"); (F64, "Float"); (F128, "F128") ];
   (* The three that share a convention must not diverge from each other. *)
   List.iter
     (fun b ->
-      check b
-        [
-          (F16, "f16");
-          (F32, "f32");
-          (F64, "f64");
-          (F128, "f128");
-        ])
+      check b [ (F16, "f16"); (F32, "f32"); (F64, "f64"); (F128, "f128") ])
     [ "fstar"; "coq"; "hol4" ];
   (* [rocq] is accepted as a spelling of coq and must not fall through to another backend. *)
   check "rocq" [ (F64, "f64"); (F128, "f128") ];

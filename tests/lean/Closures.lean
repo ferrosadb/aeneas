@@ -22,18 +22,21 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace closures
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [core::iter::traits::iterator::Iterator::map]:
     Source: '/rustc/library/core/src/iter/traits/iterator.rs', lines 845:4-848:34
     Name pattern: [core::iter::traits::iterator::Iterator::map]
     Visibility: public -/
 @[trait_default, rust_fun "core::iter::traits::iterator::Iterator::map"]
-axiom core.iter.traits.iterator.Iterator.map.default
+def core.iter.traits.iterator.Iterator.map.default
   {Self : Type _} {B : Type _} {F : Type _} {Clause0_Item : Type _}
   (IteratorInst : core.iter.traits.iterator.Iterator Self Clause0_Item)
   (opsfunctionFnMutFTupleClause0_ItemBInst : core.ops.function.FnMut F
   Clause0_Item B) :
   Self → F → Result (core.iter.adapters.map.Map Self F)
+  := sorry
 
 /-- [closures::call_fn_no_state::{closure}]
     Source: 'tests/src/closures.rs', lines 4:15-4:40 -/
@@ -303,3 +306,4 @@ def map_fn_pointer (x : alloc.vec.Vec Std.U8) : Result Unit := do
   ok ()
 
 end closures
+end

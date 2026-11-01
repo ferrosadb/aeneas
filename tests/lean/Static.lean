@@ -18,12 +18,15 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace static
 
 /-- Trait declaration: [static::WithSlice]
     Source: 'tests/src/static.rs', lines 3:0-5:1
     Visibility: public -/
-structure WithSlice (Self : Type _) where
+structure WithSlice (Self : Type) where
   SLICE : Result (Slice Std.U16)
 
 /-- [static::read]:
@@ -1173,3 +1176,4 @@ def write_static_ref
   ok (i, back)
 
 end static
+end

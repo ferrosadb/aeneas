@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1260_eliminate_shared_loans
 
 /-- [issue_1260_eliminate_shared_loans::f]: loop body 0:
@@ -51,3 +54,4 @@ def f (x : Std.U32) (y : Std.U32) : Result Std.U32 := do
   f_loop y x 0#u32
 
 end issue_1260_eliminate_shared_loans
+end

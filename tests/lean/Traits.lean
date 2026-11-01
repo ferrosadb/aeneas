@@ -18,12 +18,15 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace traits
 
 /-- Trait declaration: [traits::BoolTrait]
     Source: 'tests/src/traits.rs', lines 3:0-11:1
     Visibility: public -/
-structure BoolTrait (Self : Type _) where
+structure BoolTrait (Self : Type) where
   get_bool : Self → Result Bool
   ret_true : Self → Result Bool
 
@@ -95,7 +98,7 @@ def test_bool_trait
 /-- Trait declaration: [traits::ToU64]
     Source: 'tests/src/traits.rs', lines 41:0-43:1
     Visibility: public -/
-structure ToU64 (Self : Type _) where
+structure ToU64 (Self : Type) where
   to_u64 : Self → Result Std.U64
 
 /-- [traits::{impl traits::ToU64 for u64}::to_u64]:
@@ -187,7 +190,7 @@ def h2
 /-- Trait declaration: [traits::ToType]
     Source: 'tests/src/traits.rs', lines 90:0-92:1
     Visibility: public -/
-structure ToType (Self : Type _) (T : Type _) where
+structure ToType (Self : Type) (T : Type) where
   to_type : Self → Result T
 
 /-- [traits::{impl traits::ToType<bool> for u64}::to_type]:
@@ -206,7 +209,7 @@ def U64.Insts.TraitsToTypeBool : ToType Std.U64 Bool := {
 /-- Trait declaration: [traits::OfType]
     Source: 'tests/src/traits.rs', lines 100:0-104:1
     Visibility: public -/
-structure OfType (Self : Type _) where
+structure OfType (Self : Type) where
   of_type : forall {T : Type} (ToTypeInst : ToType T Self), T → Result Self
 
 /-- [traits::h3]:
@@ -222,7 +225,7 @@ def h3
 /-- Trait declaration: [traits::OfTypeBis]
     Source: 'tests/src/traits.rs', lines 111:0-118:1
     Visibility: public -/
-structure OfTypeBis (Self : Type _) (T : Type _) where
+structure OfTypeBis (Self : Type) (T : Type) where
   ToTypeInst : ToType T Self
   of_type : T → Result Self
 
@@ -267,7 +270,7 @@ def TestType.test
 
 /-- Trait declaration: [traits::{traits::TestType<T>}::test::TestTrait]
     Source: 'tests/src/traits.rs', lines 130:8-132:9 -/
-structure TestType.test.TestTrait (Self : Type _) where
+structure TestType.test.TestTrait (Self : Type) where
   test : Self → Result Bool
 
 /-- Trait implementation: [traits::{traits::TestType<T>}::test::{impl traits::{traits::TestType<T>}::test::TestTrait for traits::{traits::TestType<T>}::test::TestType1}]
@@ -304,8 +307,8 @@ def BoolWrapper.Insts.TraitsToType {T : Type _} (ToTypeBoolTInst : ToType Bool
 /-- Trait declaration: [traits::WithConstTy]
     Source: 'tests/src/traits.rs', lines 163:0-174:1
     Visibility: public -/
-structure WithConstTy (Self : Type _) (Self_V : Type _) (Self_W : Type _) (LEN
-  : Std.Usize) where
+structure WithConstTy (Self : Type) (Self_V : Type) (Self_W : Type) (LEN :
+  Std.Usize) where
   LEN1 : Result Std.Usize
   LEN2 : Result Std.Usize
   ToU64Inst : ToU64 Self_W
@@ -392,19 +395,19 @@ def test_where2
 /-- Trait declaration: [traits::ParentTrait0]
     Source: 'tests/src/traits.rs', lines 202:0-206:1
     Visibility: public -/
-structure ParentTrait0 (Self : Type _) (Self_W : Type _) where
+structure ParentTrait0 (Self : Type) (Self_W : Type) where
   get_name : Self → Result String
   get_w : Self → Result Self_W
 
 /-- Trait declaration: [traits::ParentTrait1]
     Source: 'tests/src/traits.rs', lines 207:0-207:25
     Visibility: public -/
-structure ParentTrait1 (Self : Type _) where
+structure ParentTrait1 (Self : Type) where
 
 /-- Trait declaration: [traits::ChildTrait]
     Source: 'tests/src/traits.rs', lines 208:0-208:52
     Visibility: public -/
-structure ChildTrait (Self : Type _) (Self_Clause0_W : Type _) where
+structure ChildTrait (Self : Type) (Self_Clause0_W : Type) where
   ParentTrait0Inst : ParentTrait0 Self Self_Clause0_W
   ParentTrait1Inst : ParentTrait1 Self
 
@@ -441,7 +444,7 @@ def order1
 /-- Trait declaration: [traits::ChildTrait1]
     Source: 'tests/src/traits.rs', lines 224:0-224:38
     Visibility: public -/
-structure ChildTrait1 (Self : Type _) where
+structure ChildTrait1 (Self : Type) where
   ParentTrait1Inst : ParentTrait1 Self
 
 /-- Trait implementation: [traits::{impl traits::ParentTrait1 for usize}]
@@ -460,42 +463,42 @@ def Usize.Insts.TraitsChildTrait1 : ChildTrait1 Std.Usize := {
 /-- Trait declaration: [traits::Iterator]
     Source: 'tests/src/traits.rs', lines 231:0-233:1
     Visibility: public -/
-structure Iterator (Self : Type _) (Self_Item : Type _) where
+structure Iterator (Self : Type) (Self_Item : Type) where
 
 /-- Trait declaration: [traits::IntoIterator]
     Source: 'tests/src/traits.rs', lines 235:0-241:1
     Visibility: public -/
-structure IntoIterator (Self : Type _) (Self_Item : Type _) (Self_IntoIter :
-  Type _) where
+structure IntoIterator (Self : Type) (Self_Item : Type) (Self_IntoIter : Type)
+  where
   IteratorInst : Iterator Self_IntoIter Self_Item
   into_iter : Self → Result Self_IntoIter
 
 /-- Trait declaration: [traits::FromResidual]
     Source: 'tests/src/traits.rs', lines 252:0-252:24 -/
-structure FromResidual (Self : Type _) (T : Type _) where
+structure FromResidual (Self : Type) (T : Type) where
 
 /-- Trait declaration: [traits::Try]
     Source: 'tests/src/traits.rs', lines 248:0-250:1 -/
-structure Try (Self : Type _) (Self_Residual : Type _) where
+structure Try (Self : Type) (Self_Residual : Type) where
   FromResidualInst : FromResidual Self Self_Residual
 
 /-- Trait declaration: [traits::WithTarget]
     Source: 'tests/src/traits.rs', lines 254:0-256:1
     Visibility: public -/
-structure WithTarget (Self : Type _) (Self_Target : Type _) where
+structure WithTarget (Self : Type) (Self_Target : Type) where
 
 /-- Trait declaration: [traits::ParentTrait2]
     Source: 'tests/src/traits.rs', lines 258:0-260:1
     Visibility: public -/
-structure ParentTrait2 (Self : Type _) (Self_U : Type _) (Self_Clause0_Target :
-  Type _) where
+structure ParentTrait2 (Self : Type) (Self_U : Type) (Self_Clause0_Target :
+  Type) where
   WithTargetInst : WithTarget Self_U Self_Clause0_Target
 
 /-- Trait declaration: [traits::ChildTrait2]
     Source: 'tests/src/traits.rs', lines 262:0-264:1
     Visibility: public -/
-structure ChildTrait2 (Self : Type _) (Self_Clause0_U : Type _)
-  (Self_Clause0_Clause0_Target : Type _) where
+structure ChildTrait2 (Self : Type) (Self_Clause0_U : Type)
+  (Self_Clause0_Clause0_Target : Type) where
   ParentTrait2Inst : ParentTrait2 Self Self_Clause0_U
     Self_Clause0_Clause0_Target
   convert : Self_Clause0_U → Result Self_Clause0_Clause0_Target
@@ -533,29 +536,28 @@ def U32.Insts.TraitsChildTrait2U32U32 : ChildTrait2 Std.U32 Std.U32 Std.U32
 /-- Trait declaration: [traits::CFnOnce]
     Source: 'tests/src/traits.rs', lines 288:0-292:1
     Visibility: public -/
-structure CFnOnce (Self : Type _) (Args : Type _) (Self_Output : Type _) where
+structure CFnOnce (Self : Type) (Args : Type) (Self_Output : Type) where
   call_once : Self → Args → Result Self_Output
 
 /-- Trait declaration: [traits::CFnMut]
     Source: 'tests/src/traits.rs', lines 294:0-296:1
     Visibility: public -/
-structure CFnMut (Self : Type _) (Args : Type _) (Self_Clause0_Output : Type _)
-  where
+structure CFnMut (Self : Type) (Args : Type) (Self_Clause0_Output : Type) where
   CFnOnceInst : CFnOnce Self Args Self_Clause0_Output
   call_mut : Self → Args → Result (Self_Clause0_Output × Self)
 
 /-- Trait declaration: [traits::CFn]
     Source: 'tests/src/traits.rs', lines 298:0-300:1
     Visibility: public -/
-structure CFn (Self : Type _) (Args : Type _) (Self_Clause0_Clause0_Output :
-  Type _) where
+structure CFn (Self : Type) (Args : Type) (Self_Clause0_Clause0_Output : Type)
+  where
   CFnMutInst : CFnMut Self Args Self_Clause0_Clause0_Output
   call : Self → Args → Result Self_Clause0_Clause0_Output
 
 /-- Trait declaration: [traits::GetTrait]
     Source: 'tests/src/traits.rs', lines 302:0-305:1
     Visibility: public -/
-structure GetTrait (Self : Type _) (Self_W : Type _) where
+structure GetTrait (Self : Type) (Self_W : Type) where
   get_w : Self → Result Self_W
 
 /-- [traits::test_get_trait]:
@@ -571,7 +573,7 @@ def test_get_trait
 /-- Trait declaration: [traits::Trait]
     Source: 'tests/src/traits.rs', lines 312:0-314:1
     Visibility: public -/
-structure Trait (Self : Type _) where
+structure Trait (Self : Type) where
   LEN : Result Std.Usize
 
 /-- [traits::{impl traits::Trait for [T; N]}::LEN]
@@ -644,3 +646,4 @@ def use_foo2
   ok (Foo.FOO T TraitInst)
 
 end traits
+end

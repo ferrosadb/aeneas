@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_270_loop_list
 
 /-- [issue_270_loop_list::List]
@@ -45,3 +48,4 @@ def foo (v : List (List Std.U8)) : Result Unit := do
   | List.Nil => ok ()
 
 end issue_270_loop_list
+end

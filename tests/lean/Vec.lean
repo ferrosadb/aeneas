@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace vec
 
 /-- [vec::use_extend_from_slice]:
@@ -45,3 +48,4 @@ def from_elem
   alloc.vec.from_elem corecloneCloneInst x n
 
 end vec
+end

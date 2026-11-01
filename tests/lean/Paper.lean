@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace paper
 
 /-- [paper::ref_incr]:
@@ -126,3 +129,4 @@ def call_choose (p : (Std.U32 × Std.U32)) : Result Std.U32 := do
   ok px1
 
 end paper
+end

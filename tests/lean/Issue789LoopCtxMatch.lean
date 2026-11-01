@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_789_loop_ctx_match
 
 /-- [issue_789_loop_ctx_match::S]
@@ -83,3 +86,4 @@ def the_loop
   ok (done1, { x := i, y := a }, next_in1)
 
 end issue_789_loop_ctx_match
+end

@@ -28,10 +28,11 @@ namespace issue_804_closure_return_ref
     Name pattern: [core::array::from_fn]
     Visibility: public -/
 @[rust_fun "core::array::from_fn"]
-axiom core.array.from_fn
+def core.array.from_fn
   {T : Type _} {F : Type _} (N : Std.Usize) (opsfunctionFnMutFTupleUsizeTInst :
   core.ops.function.FnMut F Std.Usize T) :
   F → Result (Array T N)
+  := sorry
 
 /-- [issue_804_closure_return_ref::each_ref::{closure}]
     Source: 'tests/src/issue-804-closure-return-ref.rs', lines 6:24-6:33 -/
@@ -82,3 +83,4 @@ def each_ref (s : Array Std.U8 10#usize) : Result (Array Std.U8 10#usize) := do
     each_ref.closure.Insts.CoreOpsFunctionFnMutTupleUsizeShared0U8 s
 
 end issue_804_closure_return_ref
+end

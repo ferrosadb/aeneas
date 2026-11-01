@@ -28,16 +28,17 @@ namespace derive
     Name pattern: [core::cmp::impls::{core::cmp::PartialEq<bool, bool>}::ne]
     Visibility: public -/
 @[rust_fun "core::cmp::impls::{core::cmp::PartialEq<bool, bool>}::ne"]
-axiom Bool.Insts.CoreCmpPartialEqBool.ne : Bool → Bool → Result Bool
+def Bool.Insts.CoreCmpPartialEqBool.ne : Bool → Bool → Result Bool := sorry
 
 /-- [alloc::boxed::{impl core::cmp::PartialEq<alloc::boxed::Box<T>> for alloc::boxed::Box<T>}::ne]:
     Source: '/rustc/library/alloc/src/boxed.rs', lines 2185:4-2185:38
     Name pattern: [alloc::boxed::{core::cmp::PartialEq<Box<@T>, Box<@T>>}::ne]
     Visibility: public -/
 @[rust_fun "alloc::boxed::{core::cmp::PartialEq<Box<@T>, Box<@T>>}::ne"]
-axiom Box.Insts.CoreCmpPartialEqBox.ne
+def Box.Insts.CoreCmpPartialEqBox.ne
   {T : Type _} (A : Type _) (corecmpPartialEqInst : core.cmp.PartialEq T T) :
   T → T → Result Bool
+  := sorry
 
 /-- [derive::CopyEnumOneVariant]
     Source: 'tests/src/derive.rs', lines 4:0-6:1 -/
@@ -957,3 +958,4 @@ def refs_eq (a : Struct6Fields) (b : Struct6Fields) : Result Bool := do
   Struct6Fields.Insts.CoreCmpPartialEqStruct6Fields.eq a b
 
 end derive
+end

@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace iterators_scalar
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [iterators_scalar::iter]: loop body 0:
     Source: 'tests/src/iterators-scalar.rs', lines 5:4-7:5 -/
@@ -50,3 +55,4 @@ def iter (n : Std.Usize) : Result Unit := do
   iter_loop { start := 0#usize, «end» := n } 0#i32
 
 end iterators_scalar
+end

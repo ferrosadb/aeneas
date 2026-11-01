@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace bst
 
 /-- [bst::Ordering]
@@ -31,7 +34,7 @@ inductive Ordering where
 
 /-- Trait declaration: [bst::Ord]
     Source: 'src/bst.rs', lines 11:0-13:1 -/
-structure Ord (Self : Type _) where
+structure Ord (Self : Type) where
   cmp : Self → Self → Result Ordering
 
 /-- [bst::Node]
@@ -65,3 +68,4 @@ structure TreeSet (T : Type _) where
   root : Option (Node T)
 
 end bst
+end

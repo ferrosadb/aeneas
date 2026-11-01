@@ -22,6 +22,8 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace vec_iter
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [alloc::vec::{impl core::iter::traits::collect::IntoIterator<&'a T, core::slice::iter::Iter<'a, T>> for &'a alloc::vec::Vec<T>}::into_iter]:
     Source: '/rustc/library/alloc/src/vec/mod.rs', lines 4088:4-4088:40
@@ -29,9 +31,10 @@ namespace vec_iter
     Visibility: public -/
 @[rust_fun
   "alloc::vec::{core::iter::traits::collect::IntoIterator<&'a alloc::vec::Vec<@T>, &'a @T, core::slice::iter::Iter<'a, @T>>}::into_iter"]
-axiom SharedAVec.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
+def SharedAVec.Insts.CoreIterTraitsCollectIntoIteratorSharedATIter.into_iter
   {T : Type _} (A : Type _) :
   alloc.vec.Vec T → Result (core.slice.iter.Iter T)
+  := sorry
 
 /-- [vec_iter::sum_by_value]: loop body 0:
     Source: 'tests/src/vec-iter.rs', lines 6:4-8:5
@@ -395,3 +398,4 @@ def for_over_vec_of_slices
   for_over_vec_of_slices_loop iter
 
 end vec_iter
+end

@@ -28,7 +28,8 @@ namespace mut_borrow_in_shared_borrow
     Name pattern: [core::slice::{[@T]}::first]
     Visibility: public -/
 @[rust_fun "core::slice::{[@T]}::first"]
-axiom core.slice.Slice.first {T : Type _} : Slice T → Result (Option T)
+def core.slice.Slice.first
+  {T : Type _} : Slice T → Result (Option T) := sorry
 
 /-- [mut_borrow_in_shared_borrow::MutFieldAccessViaShared]
     Source: 'tests/src/mut-borrow-in-shared-borrow.rs', lines 15:0-17:1 -/
@@ -125,3 +126,4 @@ def use_mixed_borrows_param
   ok ((i, i1), mutable)
 
 end mut_borrow_in_shared_borrow
+end

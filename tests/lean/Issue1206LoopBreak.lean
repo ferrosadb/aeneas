@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1206_loop_break
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_1206_loop_break::first_nonzero]: loop body 0:
     Source: 'tests/src/issue-1206-loop-break.rs', lines 1:0-11:5
@@ -61,3 +66,4 @@ def first_nonzero (xs : Slice Std.U8) : Result Std.Usize := do
   first_nonzero_loop { start := 0#usize, «end» := i } xs idx
 
 end issue_1206_loop_break
+end

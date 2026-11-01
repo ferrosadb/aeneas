@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace options
 
 /-- [options::test_unwrap_or]:
@@ -342,3 +345,4 @@ def test_result_unwrap_or_err : Result Unit := do
 #guard (test_result_unwrap_or_err).reducesTo ()
 
 end options
+end

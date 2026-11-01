@@ -22,13 +22,14 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace builtin_auto
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [core::ptr::null]:
     Source: '/rustc/library/core/src/ptr/mod.rs', lines 877:0-877:55
     Name pattern: [core::ptr::null]
     Visibility: public -/
 @[rust_fun "core::ptr::null"]
-axiom core.ptr.null (T : Type _) : Result (ConstRawPtr T)
+def core.ptr.null (T : Type _) : Result (ConstRawPtr T) := sorry
 
 /-- [builtin_auto::Inner]
     Source: 'tests/src/builtin-auto.rs', lines 7:0-9:1 -/
@@ -44,7 +45,7 @@ def make : Result Inner := do
 
 /-- Trait declaration: [builtin_auto::SuperPointee]
     Source: 'tests/src/builtin-auto.rs', lines 17:0-17:30 -/
-structure SuperPointee (Self : Type _) where
+structure SuperPointee (Self : Type) where
 
 /-- Trait implementation: [builtin_auto::{impl builtin_auto::SuperPointee for u32}]
     Source: 'tests/src/builtin-auto.rs', lines 19:0-19:28 -/
@@ -53,3 +54,4 @@ def U32.Insts.Builtin_autoSuperPointee : SuperPointee Std.U32 := {
 }
 
 end builtin_auto
+end

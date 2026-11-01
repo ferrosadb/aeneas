@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1140_global_loop
 
 /-- [issue_1140_global_loop::S]: loop body 0:
@@ -73,3 +76,4 @@ def C_loop (sum : Std.U32) (i : Std.U32) : Result Std.U32 := do
 @[global_simps, irreducible] def C : Result Std.U32 := C_loop 0#u32 0#u32
 
 end issue_1140_global_loop
+end

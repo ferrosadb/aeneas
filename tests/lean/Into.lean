@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace into
 
 /-- [into::slice_to_array]:
@@ -34,3 +37,4 @@ def slice_to_array1 (s : Slice Std.U8) : Result (Array Std.U8 32#usize) := do
     "Expected a slice of length 32")
 
 end into
+end

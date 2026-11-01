@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace loop_shared_loan_in_join
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [loop_shared_loan_in_join::State]
     Source: 'tests/src/loop_shared_loan_in_join.rs', lines 16:0-22:1
@@ -124,3 +129,4 @@ def State.extract
   ok ({ self with data := a, index := i }, result1)
 
 end loop_shared_loan_in_join
+end

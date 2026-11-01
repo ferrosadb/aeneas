@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace deref
 
 /-- [deref::use_deref_box]:
@@ -57,3 +60,4 @@ def use_deref_mut_vec
   ok (alloc.vec.Vec.deref_mut x)
 
 end deref
+end

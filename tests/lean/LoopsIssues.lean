@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace loops_issues
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [loops_issues::write]:
     Source: 'tests/src/loops-issues.rs', lines 5:0-5:28 -/
@@ -242,3 +247,4 @@ def loop_consume_u32 (params : WrapperU32) : Result Unit := do
   loop_consume_u32_loop { start := 0#i32, «end» := 32#i32 } params.x
 
 end loops_issues
+end

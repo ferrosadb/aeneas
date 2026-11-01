@@ -28,15 +28,17 @@ namespace rust_borrow_check_issues
     Name pattern: [core::mem::drop]
     Visibility: public -/
 @[rust_fun "core::mem::drop"]
-axiom core.mem.drop {T : Type _} : T → Result Unit
+def core.mem.drop {T : Type _} : T → Result Unit := sorry
 
 /-- [core::option::{core::option::Option<T>}::as_mut]:
     Source: '/rustc/library/core/src/option.rs', lines 766:4-766:52
     Name pattern: [core::option::{core::option::Option<@T>}::as_mut]
     Visibility: public -/
 @[rust_fun "core::option::{core::option::Option<@T>}::as_mut"]
-axiom core.option.Option.as_mut
-  {T : Type _} : Option T → Result ((Option T) × (Option T → Option T))
+def core.option.Option.as_mut
+  {T : Type _} :
+  Option T → Result ((Option T) × (Option T → Option T))
+  := sorry
 
 /-- [rust_borrow_check_issues::unnecessary_error]:
     Source: 'tests/src/rust-borrow-check-issues.rs', lines 13:0-32:1 -/
@@ -200,3 +202,4 @@ def conditional_with_indirection_2 (b0 : Bool) : Result Unit := do
   conditional_with_indirection_2_loop (some (X.mk none)) (fun o => o) b0
 
 end rust_borrow_check_issues
+end

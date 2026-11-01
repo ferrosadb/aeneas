@@ -18,15 +18,18 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace blanket_impl
 
 /-- Trait declaration: [blanket_impl::Trait1]
     Source: 'tests/src/blanket_impl.rs', lines 3:0-3:15 -/
-structure Trait1 (Self : Type _) where
+structure Trait1 (Self : Type) where
 
 /-- Trait declaration: [blanket_impl::Trait2]
     Source: 'tests/src/blanket_impl.rs', lines 4:0-6:1 -/
-structure Trait2 (Self : Type _) where
+structure Trait2 (Self : Type) where
   foo : Result Unit
 
 /-- [blanket_impl::Trait2::foo]:
@@ -43,3 +46,4 @@ def Trait2.Blanket {T : Type _} (Trait1Inst : Trait1 T) : Trait2 T := {
 }
 
 end blanket_impl
+end

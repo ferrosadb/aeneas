@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_440_type_error
 
 /-- [issue_440_type_error::PeanoNum]
@@ -37,3 +40,4 @@ def f (x : PeanoNum) (value : Std.Isize) : Result PeanoNum := do
   | PeanoNum.Succ _ => ok x
 
 end issue_440_type_error
+end

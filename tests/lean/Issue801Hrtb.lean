@@ -18,11 +18,14 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_801_hrtb
 
 /-- Trait declaration: [issue_801_hrtb::T]
     Source: 'tests/src/issue-801-hrtb.rs', lines 4:0-6:1 -/
-structure T (Self : Type _) (X : Type _) where
+structure T (Self : Type) (X : Type) where
   dummy : Result X
 
 /-- [issue_801_hrtb::test]:
@@ -31,3 +34,4 @@ def test {P : Type _} (TPSharedU8Inst : T P Std.U8) : Result Std.U8 := do
   TPSharedU8Inst.dummy
 
 end issue_801_hrtb
+end

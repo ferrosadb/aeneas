@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace joins
 
 /-- [joins::opt_add_1]:
@@ -117,3 +120,4 @@ def shared_integer_scrutinee
   else ok 0#u32
 
 end joins
+end

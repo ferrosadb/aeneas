@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace chunks_exact
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [chunks_exact::test_chunks_exact_exact_fit]:
     Source: 'tests/src/chunks_exact.rs', lines 8:0-22:1
@@ -260,3 +265,4 @@ def test_chunks_exact_2_single_element : Result Unit := do
 #guard (test_chunks_exact_2_single_element).reducesTo ()
 
 end chunks_exact
+end

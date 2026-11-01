@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace loops_nested
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [loops_nested::iter]: loop body 1:
     Source: 'tests/src/loops-nested.rs', lines 7:8-9:9
@@ -553,3 +558,4 @@ def mul_add_as_plus_e
   ok out
 
 end loops_nested
+end

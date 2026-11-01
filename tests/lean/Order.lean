@@ -18,7 +18,11 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace order
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [order::compare]:
     Source: 'tests/src/order.rs', lines 7:0-9:1
@@ -646,3 +650,4 @@ def test_keyed_clamp_tie : Result Unit := do
 #guard (test_keyed_clamp_tie).reducesTo ()
 
 end order
+end

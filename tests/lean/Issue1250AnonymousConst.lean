@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1250_anonymous_const
 
 /-- [issue_1250_anonymous_const::_]
@@ -29,3 +32,4 @@ namespace issue_1250_anonymous_const
 @[global_simps, irreducible] def __1 : Unit := ()
 
 end issue_1250_anonymous_const
+end

@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_134_loop_shared_borrows
 
 /-- [issue_134_loop_shared_borrows::AVLNode]
@@ -54,3 +57,4 @@ def AVLNode.find (self : AVLNode) : Result Bool := do
   ok false
 
 end issue_134_loop_shared_borrows
+end

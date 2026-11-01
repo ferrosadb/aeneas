@@ -18,16 +18,19 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace from_to
 
 /-- Trait declaration: [from_to::From]
     Source: 'tests/src/from_to.rs', lines 3:0-5:1 -/
-structure From (Self : Type _) (T : Type _) where
+structure From (Self : Type) (T : Type) where
   «from» : T → Result Self
 
 /-- Trait declaration: [from_to::To]
     Source: 'tests/src/from_to.rs', lines 7:0-11:1 -/
-structure To (Self : Type _) where
+structure To (Self : Type) where
   «to» : forall {T : Type} (FromInst : From T Self), Self → Result T
 
 /-- [from_to::{impl from_to::From<u32> for u32}::from]:
@@ -59,3 +62,4 @@ def U32.Insts.From_toTo : To Std.U32 := {
 }
 
 end from_to
+end

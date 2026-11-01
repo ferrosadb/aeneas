@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace generic_unit_output
 
 /-- [generic_unit_output::set_and_return]:
@@ -36,3 +39,4 @@ def call_with_unit (n : Std.U32) : Result Std.U32 := do
   ok n2
 
 end generic_unit_output
+end

@@ -22,18 +22,21 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace issue_1043_iterator_methods
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [core::iter::traits::iterator::Iterator::map]:
     Source: '/rustc/library/core/src/iter/traits/iterator.rs', lines 845:4-848:34
     Name pattern: [core::iter::traits::iterator::Iterator::map]
     Visibility: public -/
 @[trait_default, rust_fun "core::iter::traits::iterator::Iterator::map"]
-axiom core.iter.traits.iterator.Iterator.map.default
+def core.iter.traits.iterator.Iterator.map.default
   {Self : Type _} {B : Type _} {F : Type _} {Clause0_Item : Type _}
   (IteratorInst : core.iter.traits.iterator.Iterator Self Clause0_Item)
   (opsfunctionFnMutFTupleClause0_ItemBInst : core.ops.function.FnMut F
   Clause0_Item B) :
   Self → F → Result (core.iter.adapters.map.Map Self F)
+  := sorry
 
 /-- [core::iter::adapters::map::{impl core::iter::traits::iterator::Iterator<B> for core::iter::adapters::map::Map<I, F>}::next]:
     Source: '/rustc/library/core/src/iter/adapters/map.rs', lines 106:4-106:35
@@ -41,13 +44,14 @@ axiom core.iter.traits.iterator.Iterator.map.default
     Visibility: public -/
 @[rust_fun
   "core::iter::adapters::map::{core::iter::traits::iterator::Iterator<core::iter::adapters::map::Map<@I, @F>, @B>}::next"]
-axiom core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator.next
+def core.iter.adapters.map.Map.Insts.CoreIterTraitsIteratorIterator.next
   {B : Type _} {I : Type _} {F : Type _} {Clause0_Item : Type _}
   (traitsiteratorIteratorInst : core.iter.traits.iterator.Iterator I
   Clause0_Item) (opsfunctionFnMutFTupleClause0_ItemBInst :
   core.ops.function.FnMut F Clause0_Item B) :
   core.iter.adapters.map.Map I F → Result ((Option B) ×
     (core.iter.adapters.map.Map I F))
+  := sorry
 
 /-- Trait implementation: [core::iter::adapters::map::{impl core::iter::traits::iterator::Iterator<B> for core::iter::adapters::map::Map<I, F>}]
     Source: '/rustc/library/core/src/iter/adapters/map.rs', lines 99:0-101:27
@@ -158,3 +162,4 @@ def call_it (n : Std.U32) : Result (alloc.vec.Vec Std.U32) := do
     core.iter.range.StepU32) { start := 0#u32, «end» := n }
 
 end issue_1043_iterator_methods
+end

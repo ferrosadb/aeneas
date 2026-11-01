@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace iterators
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [iterators::iter_range]: loop body 0:
     Source: 'tests/src/iterators.rs', lines 5:4-5:28 -/
@@ -518,3 +523,4 @@ def zip_iter (a : Slice Std.U8) (b : Slice Std.U8) : Result Unit := do
   zip_iter_loop iter
 
 end iterators
+end

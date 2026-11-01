@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace dynamic_size
 
 /-- [dynamic_size::alloc_slice]:
@@ -39,3 +42,4 @@ def alloc_wrapper (N : Std.Usize) : Result (Wrapper (Slice Std.U8)) := do
   ok { data := (Std.Array.to_slice a) }
 
 end dynamic_size
+end

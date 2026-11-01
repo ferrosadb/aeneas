@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace lean_keywords_clash
 
 /-- [lean_keywords_clash::end]:
@@ -51,3 +54,4 @@ theorem Rec.v._simpLemma_ (end1 : Option Rec) (v : Std.U32) :
   (Rec.mk end1 v).v = v := by rfl
 
 end lean_keywords_clash
+end

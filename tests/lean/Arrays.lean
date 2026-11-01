@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace arrays
 
 /-- [arrays::AB]
@@ -752,3 +755,4 @@ def Scalar := Array Std.U32 2#usize
 def L : Scalar := Array.make 2#usize [ 0#u32, 1#u32 ]
 
 end arrays
+end

@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace cast_signed
 
 /-- [cast_signed::test_u8_cast_signed_all_ones]:
@@ -173,3 +176,4 @@ def test_isize_cast_unsigned_neg_one : Result Unit := do
 #guard (test_isize_cast_unsigned_neg_one).reducesTo ()
 
 end cast_signed
+end

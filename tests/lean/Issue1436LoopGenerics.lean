@@ -18,7 +18,12 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_1436_loop_generics
+def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_1436_loop_generics::sum]: loop body 0:
     Source: 'tests/src/issue-1436-loop-generics.rs', lines 15:4-17:5
@@ -193,13 +198,13 @@ def count
 /-- Trait declaration: [issue_1436_loop_generics::Tr]
     Source: 'tests/src/issue-1436-loop-generics.rs', lines 60:0-62:1
     Visibility: public -/
-structure Tr (Self : Type _) where
+structure Tr (Self : Type) where
   f : Self → Result Std.U32
 
 /-- Trait declaration: [issue_1436_loop_generics::Wrap]
     Source: 'tests/src/issue-1436-loop-generics.rs', lines 65:0-65:24
     Visibility: public -/
-structure Wrap (Self : Type _) (T : Type _) where
+structure Wrap (Self : Type) (T : Type) where
   TrInst : Tr Self
 
 /-- [issue_1436_loop_generics::loop_wrap]: loop body 0:
@@ -245,7 +250,7 @@ def loop_wrap
 /-- Trait declaration: [issue_1436_loop_generics::HasN]
     Source: 'tests/src/issue-1436-loop-generics.rs', lines 79:0-79:37
     Visibility: public -/
-structure HasN (Self : Type _) (N : Std.Usize) where
+structure HasN (Self : Type) (N : Std.Usize) where
   TrInst : Tr Self
 
 /-- [issue_1436_loop_generics::loop_const_generic]: loop body 0:
@@ -291,7 +296,7 @@ def loop_const_generic
 /-- Trait declaration: [issue_1436_loop_generics::Wrap2]
     Source: 'tests/src/issue-1436-loop-generics.rs', lines 94:0-94:30
     Visibility: public -/
-structure Wrap2 (Self : Type _) (T : Type _) where
+structure Wrap2 (Self : Type) (T : Type) where
   WrapInst : Wrap Self T
 
 /-- [issue_1436_loop_generics::loop_wrap2]: loop body 0:
@@ -335,3 +340,4 @@ def loop_wrap2
   loop_wrap2_loop Wrap2Inst w n 0#u32 0#u32
 
 end issue_1436_loop_generics
+end

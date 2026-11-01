@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace issue_194_recursive_struct_projector
 
 /-- [issue_194_recursive_struct_projector::AVLNode]
@@ -60,3 +63,4 @@ def get_left {T : Type _} (x : AVLNode T) : Result (Option (AVLNode T)) := do
   ok x.left
 
 end issue_194_recursive_struct_projector
+end

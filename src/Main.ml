@@ -50,8 +50,16 @@ let () =
     flush stderr
   in
   at_exit report;
-  Sys.set_signal Sys.sigterm (Sys.Signal_handle (fun _ -> report (); exit 1));
-  Sys.set_signal Sys.sigint (Sys.Signal_handle (fun _ -> report (); exit 1));
+  Sys.set_signal Sys.sigterm
+    (Sys.Signal_handle
+       (fun _ ->
+         report ();
+         exit 1));
+  Sys.set_signal Sys.sigint
+    (Sys.Signal_handle
+       (fun _ ->
+         report ();
+         exit 1));
   try
     ignore
       (Unix.setitimer Unix.ITIMER_REAL

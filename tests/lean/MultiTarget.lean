@@ -25,7 +25,7 @@ namespace multi_target
 
 /-- Trait declaration: [multi_target::SimdTrait]
     Source: 'tests/src/multi-target.rs', lines 5:0-8:1 -/
-structure SimdTrait (Self : Type _) (Self_Vec : Type _) where
+structure SimdTrait (Self : Type) (Self_Vec : Type) where
   coremarkerCopyInst : core.marker.Copy Self_Vec
   add : Self_Vec → Self_Vec → Result Self_Vec
 
@@ -139,3 +139,4 @@ def «Fooaarch64-apple-darwin».f
   ok ()
 
 end multi_target
+end

@@ -18,11 +18,15 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace defaulted_method
+def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- Trait declaration: [defaulted_method::Trait]
     Source: 'tests/src/defaulted_method.rs', lines 2:0-7:1 -/
-structure Trait (Self : Type _) where
+structure Trait (Self : Type) where
   provided_method : Self → Result Std.U32
   required_method : Self → Result Std.U32
 
@@ -88,3 +92,4 @@ def main : Result Unit := do
   massert (n = 1#i32)
 
 end defaulted_method
+end
