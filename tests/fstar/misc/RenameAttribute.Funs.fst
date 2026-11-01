@@ -7,3 +7,64 @@ include RenameAttribute.Clauses
 
 #set-options "--z3rlimit 50 --fuel 1 --ifuel 1"
 
+(** [rename_attribute::BoolTrait::ret_true]:
+    Source: 'tests/src/rename_attribute.rs', lines 17:4-19:5
+    Visibility: public *)
+let boolTrait_retTest_default (#self : Type0) (self1 : self) : result bool =
+  Ok true
+
+(** [rename_attribute::{impl rename_attribute::BoolTrait for bool}::get_bool]:
+    Source: 'tests/src/rename_attribute.rs', lines 24:4-26:5
+    Visibility: public *)
+let boolImpl_getTest (self : bool) : result bool =
+  Ok self
+
+(** Trait implementation: [rename_attribute::{impl rename_attribute::BoolTrait for bool}]
+    Source: 'tests/src/rename_attribute.rs', lines 23:0-27:1 *)
+let boolImpl : boolTest_t bool = {
+  getTest = boolImpl_getTest;
+  retTest = boolTrait_retTest_default;
+}
+
+(** [rename_attribute::test_bool_trait]:
+    Source: 'tests/src/rename_attribute.rs', lines 30:0-32:1
+    Visibility: public *)
+let boolFn (t : Type0) (x : bool) : result bool =
+  let* b = boolImpl_getTest x in
+  if b then boolTrait_retTest_default x else Ok false
+
+(** [rename_attribute::C]
+    Source: 'tests/src/rename_attribute.rs', lines 52:0-52:28 *)
+let const_Test : result u32 = let* i = u32_add 100 10 in u32_add i 1
+
+(** [rename_attribute::CA]
+    Source: 'tests/src/rename_attribute.rs', lines 55:0-55:23 *)
+let const_Aeneas11 : result u32 = u32_add 10 1
+
+(** [rename_attribute::factorial]:
+    Source: 'tests/src/rename_attribute.rs', lines 58:0-64:1 *)
+let rec factfn (n : u64) : Tot (result u64) (decreases (factfn_decreases n)) =
+  if n <= 1
+  then Ok 1
+  else let* i = u64_sub n 1 in let* i1 = factfn i in u64_mul n i1
+
+(** [rename_attribute::sum]: loop 0:
+    Source: 'tests/src/rename_attribute.rs', lines 70:4-73:5
+    Visibility: public *)
+let rec no_borrows_sum_loop
+  (max : u32) (i : u32) (s : u32) :
+  Tot (result u32) (decreases (no_borrows_sum_loop_decreases max i s))
+  =
+  if i < max
+  then
+    let* s1 = u32_add s i in
+    let* i1 = u32_add i 1 in
+    no_borrows_sum_loop max i1 s1
+  else Ok s
+
+(** [rename_attribute::sum]:
+    Source: 'tests/src/rename_attribute.rs', lines 67:0-77:1
+    Visibility: public *)
+let no_borrows_sum (max : u32) : result u32 =
+  let* s = no_borrows_sum_loop max 0 0 in u32_mul s 2
+

@@ -1343,77 +1343,77 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
     (* The same for an impl whose trait is not translated: its methods are emitted, but the instance
      value that call sites pass has no declaration. Emit it as a hole of the trait applied to the
      impl's own type arguments, which are already printable from the LLBC impl. *)
-    if config.extract_types && config.extract_trait_decls then (
-      let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
-      TraitImplId.Map.iter
-        (fun (id : TraitImplId.id) (def : LlbcAst.trait_impl) ->
-          let trait_id = def.impl_trait.id in
-          if
-            (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
-            && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
-            && match_name_find_opt ctx.trans_ctx
-                 (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta
-                   .name builtin_traits
-               = None
-          then
-            try
-              let trait_name =
-                ExtractBase.ctx_get None (TraitDeclId trait_id) ctx
-              in
-              let types, consts =
-                ExtractBase.llbc_generic_args_to_strings ctx
-                  def.impl_trait.generics
-              in
-              let impl_name =
-                ExtractBase.ctx_compute_trait_impl_name_raw ctx id
-              in
-              (* The LLBC printer renders Rust syntax (`&'b str`), which is not a Lean type. When an
-               argument is not printable, fall back to the self type carried by the impl's own name:
-               aeneas builds it as `<self type>.Insts.<trait>`. Sound only with one type argument and
-               no const generic; anything else is left for a later pass. *)
-              let lean_safe s =
-                String.for_all
-                  (function
-                    | 'a' .. 'z'
-                    | 'A' .. 'Z'
-                    | '0' .. '9'
-                    | '.' | '_' | '(' | ')' -> true
-                    | _ -> false)
-                  s
-              in
-              let args = types @ consts in
-              let args =
-                if List.for_all lean_safe args then Some args
-                else if List.length types = 1 && consts = [] then
-                  match String.index_opt impl_name '.' with
-                  | Some i
-                    when String.starts_with ~prefix:".Insts."
-                           (String.sub impl_name i
-                              (String.length impl_name - i)) ->
-                      Some [ String.sub impl_name 0 i ]
-                  | _ -> None
-                else None
-              in
-              match args with
-              | None -> ()
-              | Some args ->
-                  Format.pp_open_hvbox fmt 0;
-                  Format.pp_print_string fmt
-                    ("def " ^ impl_name ^ " : " ^ trait_name);
-                  List.iter (fun a -> Format.pp_print_string fmt (" " ^ a)) args;
-                  Format.pp_print_string fmt " := sorry";
-                  Format.pp_close_box fmt ();
-                  Format.pp_print_break fmt 0 0
-            with CFailure _ -> ())
-        ctx.crate.trait_impls;
+    let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
+    TraitImplId.Map.iter
+      (fun (id : TraitImplId.id) (def : LlbcAst.trait_impl) ->
+        let trait_id = def.impl_trait.id in
+        if
+          (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
+          && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
+          && match_name_find_opt ctx.trans_ctx
+               (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta
+                 .name builtin_traits
+             = None
+        then
+          try
+            let trait_name =
+              ExtractBase.ctx_get None (TraitDeclId trait_id) ctx
+            in
+            let types, consts =
+              ExtractBase.llbc_generic_args_to_strings ctx
+                def.impl_trait.generics
+            in
+            let impl_name =
+              ExtractBase.ctx_compute_trait_impl_name_raw ctx id
+            in
+            (* The LLBC printer renders Rust syntax (`&'b str`), which is not a Lean type. When an
+             argument is not printable, fall back to the self type carried by the impl's own name:
+             aeneas builds it as `<self type>.Insts.<trait>`. Sound only with one type argument and
+             no const generic; anything else is left for a later pass. *)
+            let lean_safe s =
+              String.for_all
+                (function
+                  | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '.' | '_' | '(' | ')'
+                    -> true
+                  | _ -> false)
+                s
+            in
+            let args = types @ consts in
+            let args =
+              if List.for_all lean_safe args then Some args
+              else if List.length types = 1 && consts = [] then
+                match String.index_opt impl_name '.' with
+                | Some i
+                  when String.starts_with ~prefix:".Insts."
+                         (String.sub impl_name i (String.length impl_name - i))
+                  -> Some [ String.sub impl_name 0 i ]
+                | _ -> None
+              else None
+            in
+            match args with
+            | None -> ()
+            | Some args ->
+                Format.pp_open_hvbox fmt 0;
+                Format.pp_print_string fmt
+                  ("def " ^ impl_name ^ " : " ^ trait_name);
+                List.iter (fun a -> Format.pp_print_string fmt (" " ^ a)) args;
+                Format.pp_print_string fmt " := sorry";
+                Format.pp_close_box fmt ();
+                Format.pp_print_break fmt 0 0
+          with CFailure _ -> ())
+      ctx.crate.trait_impls);
 
-      List.iter
-        (fun g ->
-          try export_decl_group g
-          with CFailure _ ->
-            (* An exception was raised: ignore it *)
-            ())
-        (Option.get ctx.crate.declarations)))
+  (* The declaration groups are the body of the file. This loop must stay outside the branches
+     above: [split-files] turns [extract_types] and [extract_trait_decls] off for the functions
+     file, so nesting it under those flags emitted an empty [Funs.lean] -- a model with no
+     definitions, and every proof about it then failed on an unknown constant. *)
+  List.iter
+    (fun g ->
+      try export_decl_group g
+      with CFailure _ ->
+        (* An exception was raised: ignore it *)
+        ())
+    (Option.get ctx.crate.declarations)
 
 type extract_file_info = {
   filename : string;
