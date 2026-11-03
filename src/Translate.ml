@@ -1368,10 +1368,65 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
      blank lines between every later declaration. *)
   if config.extract_types && config.extract_trait_decls then (
     let builtin_traits = ExtractBuiltin.mk_builtin_trait_decls_map () in
+    (* Rust declarations behind a builtin model are not emitted. In particular,
+       their unused trait methods must not pull opaque traits into this file.
+       Keep fallback declarations only when a local item reaches them without
+       crossing such a model boundary. *)
+    let builtin_types = ExtractBuiltin.builtin_types_map () in
+    let builtin_funs = ExtractBuiltin.builtin_funs_map () in
+    let builtin_impls = ExtractBuiltin.builtin_trait_impls_map () in
+    let is_builtin id =
+      let matches name map =
+        Option.is_some (match_name_find_opt ctx.trans_ctx name map)
+      in
+      match id with
+      | IdType id ->
+          Option.fold ~none:false
+            ~some:(fun (d : Types.type_decl) ->
+              matches d.item_meta.name builtin_types)
+            (TypeDeclId.Map.find_opt id ctx.crate.type_decls)
+      | IdFun id ->
+          Option.fold ~none:false
+            ~some:(fun (d : LlbcAst.fun_decl) ->
+              matches d.item_meta.name builtin_funs)
+            (FunDeclId.Map.find_opt id ctx.crate.fun_decls)
+      | IdTraitDecl id ->
+          Option.fold ~none:false
+            ~some:(fun (d : LlbcAst.trait_decl) ->
+              matches d.item_meta.name builtin_traits)
+            (TraitDeclId.Map.find_opt id ctx.crate.trait_decls)
+      | IdTraitImpl id ->
+          Option.fold ~none:false
+            ~some:(fun (d : LlbcAst.trait_impl) ->
+              Option.fold ~none:false
+                ~some:(fun (trait : LlbcAst.trait_decl) ->
+                  Option.is_some
+                    (match_name_with_generics_find_opt ctx.trans_ctx
+                       trait.item_meta.name d.impl_trait.generics builtin_impls))
+                (TraitDeclId.Map.find_opt d.impl_trait.id ctx.crate.trait_decls))
+            (TraitImplId.Map.find_opt id ctx.crate.trait_impls)
+      | IdGlobal _ -> false
+    in
+    let graph = ctx.trans_ctx.graph_of_uses in
+    let graph =
+      {
+        graph with
+        graph =
+          LlbcAstUtils.AnyDeclIdMap.map
+            (Deps.ItemInfoSet.filter (fun (user : Deps.item_info) ->
+                 not (is_builtin user.id)))
+            graph.graph;
+      }
+    in
+    let is_used id =
+      LlbcAstUtils.AnyDeclIdSet.mem id graph.locals
+      || not (Deps.ItemInfoSet.is_empty (Deps.compute_local_uses graph [ id ]))
+    in
     TraitDeclId.Map.iter
       (fun (id : TraitDeclId.id) (def : LlbcAst.trait_decl) ->
         if
           (not (Pure.TraitDeclId.Map.mem id ctx.trans_trait_decls))
+          && is_used (IdTraitDecl id)
           && match_name_find_opt ctx.trans_ctx def.item_meta.name builtin_traits
              = None
         then
@@ -1405,6 +1460,7 @@ let extract_definitions (fmt : Format.formatter) (config : gen_config)
         let trait_id = def.impl_trait.id in
         if
           (not (Pure.TraitDeclId.Map.mem trait_id ctx.trans_trait_decls))
+          && is_used (IdTraitImpl id)
           && TraitDeclId.Map.mem trait_id ctx.crate.trait_decls
           && match_name_find_opt ctx.trans_ctx
                (TraitDeclId.Map.find trait_id ctx.crate.trait_decls).item_meta

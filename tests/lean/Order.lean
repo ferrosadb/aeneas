@@ -22,7 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace order
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [order::compare]:
     Source: 'tests/src/order.rs', lines 7:0-9:1

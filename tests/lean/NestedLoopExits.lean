@@ -18,6 +18,9 @@ set_option maxHeartbeats 1000000
 /- You can set the `maxRecDepth` value with the `-max-recdepth` CLI option -/
 set_option maxRecDepth 2048
 
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+noncomputable section
+
 namespace nested_loop_exits
 
 /-- [nested_loop_exits::find]: loop body 1:
@@ -28,14 +31,14 @@ def find_loop0_loop0.body
   (v : Slice Std.U32) (x : Std.U32) (i : Std.Usize) (j : Std.Usize) :
   Result (ControlFlow Std.Usize (Option (Option Std.Usize)))
   := do
-  if (j < 4#usize : Bool)
+  if j < 4#usize
   then
     let i1 ← i + j
     let i2 := Slice.len v
-    if (i1 < i2 : Bool)
+    if i1 < i2
     then
       let i3 ← Slice.index_usize v i1
-      if (i3 = x : Bool)
+      if i3 = x
       then ok (done (some (some i1)))
       else let j1 ← j + 1#usize
            ok (cont j1)
@@ -67,7 +70,7 @@ def find_loop0.body
   match o with
   | none =>
     let i1 := Slice.len v
-    if (i >= i1 : Bool)
+    if i >= i1
     then ok (done none)
     else let i2 ← i + 4#usize
          ok (cont i2)
@@ -107,10 +110,10 @@ def outer_break_loop0_loop0.body
   | none => ok (done (s, false, false))
   | some j =>
     let i1 ← i * j
-    if (i1 > 10#u32 : Bool)
+    if i1 > 10#u32
     then ok (done (s, true, false))
     else
-      if (j > i : Bool)
+      if j > i
       then ok (done (s, false, true))
       else let s1 ← s + 1#u32
            ok (cont (iter1, s1))
@@ -176,11 +179,11 @@ def first_space_loop.body
   Result (ControlFlow Std.Usize (Option Std.Usize))
   := do
   let i1 := Slice.len v
-  if (i >= i1 : Bool)
+  if i >= i1
   then ok (done none)
   else
     let i2 ← Slice.index_usize v i
-    if (i2 = 32#u8 : Bool)
+    if i2 = 32#u8
     then ok (done (some i))
     else let i3 ← i + 1#usize
          ok (cont i3)
@@ -204,3 +207,4 @@ def first_space (v : Slice Std.U8) (b : Bool) : Result (Option Std.Usize) := do
   else ok none
 
 end nested_loop_exits
+end

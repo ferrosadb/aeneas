@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace issue_807_missing_symbolic_value
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_807_missing_symbolic_value::PortableVector]
     Source: 'tests/src/issue-807-missing-symbolic-value.rs', lines 4:0-6:1 -/

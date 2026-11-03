@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace issue_1436_loop_generics_rec
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_1436_loop_generics_rec::sum]: loop 0:
     Source: 'tests/src/issue-1436-loop-generics-rec.rs', lines 16:4-18:5
