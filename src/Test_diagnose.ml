@@ -54,7 +54,8 @@ let () =
        ~rank:3);
   expect "memory_line: negative delta prints its sign"
     "mem   -64.0 MiB  live    512.0 MiB  size      10  rank     9  f"
-    (Diagnose.memory_line ~name:"f" ~delta_words:(-(64 * 131_072))
+    (Diagnose.memory_line ~name:"f"
+       ~delta_words:(-(64 * 131_072))
        ~live_words:(512 * 131_072) ~size:10 ~rank:9);
 
   (* The function that never finishes: its start line is the only evidence a killed run

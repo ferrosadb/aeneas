@@ -974,7 +974,9 @@ and extract_function_call (span : Meta.span) (ctx : extraction_ctx)
       (match fun_id with
       | FromLlbc (TraitMethod (trait_ref, method_name), lp_id) -> (
           let trait_decl_id = trait_ref.trait_decl_ref.trait_decl_id in
-          match TraitDeclId.Map.find_opt trait_decl_id ctx.trans_trait_decls with
+          match
+            TraitDeclId.Map.find_opt trait_decl_id ctx.trans_trait_decls
+          with
           | None ->
               (* The call goes through a trait this crate does not declare, so
                  there is no span to comment on and no method to qualify. A bare
@@ -1034,13 +1036,13 @@ and extract_function_call (span : Meta.span) (ctx : extraction_ctx)
               with
               | None -> [%craise] span "Could not lookup the trait declaration"
               | Some trait_decl ->
-              let meth =
-                List.find
-                  (fun (meth : trait_method) -> meth.method_id = method_id)
-                  trait_decl.methods
-              in
-              let explicit = meth.signature.explicit_info in
-              Some (adjust_explicit_info explicit true generics)
+                  let meth =
+                    List.find
+                      (fun (meth : trait_method) -> meth.method_id = method_id)
+                      trait_decl.methods
+                  in
+                  let explicit = meth.signature.explicit_info in
+                  Some (adjust_explicit_info explicit true generics)
             end
           | Pure
               (UpdateAtIndex Array | IndexAtIndex Array | IndexMutAtIndex Array)
@@ -3455,7 +3457,7 @@ let extract_trait_impl_method_items (ctx : extraction_ctx) (fmt : F.formatter)
     (impl : trait_impl) (method_id : trait_method_id) (fn : fun_decl_ref binder)
     : unit =
   try extract_trait_impl_method_items_aux ctx fmt impl method_id fn
-  with CFailure _ ->
+  with CFailure _ -> (
     (* The method's body could not be translated, so the field gets an [admit] -- but the
        field must be *named*. A bare [sorry] inside the record braces is not a structure
        instance to Lean at all: it is a singleton set literal, and elaboration then fails
@@ -3463,20 +3465,20 @@ let extract_trait_impl_method_items (ctx : extraction_ctx) (fmt : F.formatter)
        names a type class and reads like a missing instance rather than a printer fault.
        The method name does not depend on the function that failed, so it is still
        available here. *)
-    (try
-       let fun_name =
-         ctx_get_trait_method impl.item_meta.span impl.impl_trait.trait_decl_id
-           method_id ctx
-       in
-       extract_trait_impl_item ctx fmt fun_name (fun () ->
-           F.pp_print_space fmt ();
-           extract_admit fmt)
-     with CFailure _ ->
-       (* Only reachable if the trait declaration itself was never translated. *)
-       [%save_error] impl.item_meta.span
-         "Could not name the trait method of an untranslated implementation";
-       F.pp_print_space fmt ();
-       extract_admit fmt)
+    try
+      let fun_name =
+        ctx_get_trait_method impl.item_meta.span impl.impl_trait.trait_decl_id
+          method_id ctx
+      in
+      extract_trait_impl_item ctx fmt fun_name (fun () ->
+          F.pp_print_space fmt ();
+          extract_admit fmt)
+    with CFailure _ ->
+      (* Only reachable if the trait declaration itself was never translated. *)
+      [%save_error] impl.item_meta.span
+        "Could not name the trait method of an untranslated implementation";
+      F.pp_print_space fmt ();
+      extract_admit fmt)
 
 (** Extract a trait implementation *)
 let extract_trait_impl (ctx : extraction_ctx) (fmt : F.formatter)

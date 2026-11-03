@@ -496,7 +496,8 @@ let translate_crate_to_pure (crate : crate) (marked_ids : marked_ids) :
          once keeps the bound proportional to the crate instead of to the core count. *)
       let biggest =
         List.fold_left
-          (fun acc (_, f) -> Stdlib.max acc (LlbcAstUtils.compute_fun_decl_size f))
+          (fun acc (_, f) ->
+            Stdlib.max acc (LlbcAstUtils.compute_fun_decl_size f))
           0 funs
       in
       let budget =
@@ -506,13 +507,11 @@ let translate_crate_to_pure (crate : crate) (marked_ids : marked_ids) :
       let max_jobs =
         if !Config.max_parallel_jobs > 0 then !Config.max_parallel_jobs
         else
-          max_jobs_for
-            ~available_mb:(available_memory_mb ())
+          max_jobs_for ~available_mb:(available_memory_mb ())
             ~cores:(Domain.recommended_domain_count ())
       in
       let max_jobs =
-        jobs_for_diagnosis
-          ~diagnose_memory:!Config.diagnose_memory ~max_jobs
+        jobs_for_diagnosis ~diagnose_memory:!Config.diagnose_memory ~max_jobs
       in
       ProgressBar.with_parallel_reporter num_decls
         ("Translated " ^ kind ^ " functions: ")
@@ -555,8 +554,7 @@ let translate_crate_to_pure (crate : crate) (marked_ids : marked_ids) :
                 let live_after = (Gc.quick_stat ()).Gc.live_words in
                 Diagnose.log_memory
                   ~name:(name_to_string trans_ctx x.item_meta.name)
-                  ~delta_words:(live_after - live_before)
-                  ~live_words:live_after
+                  ~delta_words:(live_after - live_before) ~live_words:live_after
                   ~size:(LlbcAstUtils.compute_fun_decl_size x)
                   ~rank
               end;

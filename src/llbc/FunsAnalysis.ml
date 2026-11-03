@@ -313,11 +313,14 @@ let analyze_module (m : crate) (funs_map : fun_decl FunDeclId.Map.t) :
            rest of the module. *)
         let funs =
           List.filter_map
-            (fun id -> match id with Charon.Meta.IdFun id -> Some id | _ -> None)
+            (fun id ->
+              match id with
+              | Charon.Meta.IdFun id -> Some id
+              | _ -> None)
             (Charon.GAstUtils.g_declaration_group_to_list ids)
         in
-        if funs <> [] then
-          (try analyze_fun_decl_group funs
+        (if funs <> [] then
+           try analyze_fun_decl_group funs
            with CFailure error ->
              [%save_error_opt_span] error.span
                ("Encountered an error when analyzing the functions of a mixed \

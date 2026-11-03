@@ -124,18 +124,19 @@ let parallel_filter_map_pool f ls =
 
 (** Run a filter_map with bounded work in flight.
 
-    [parallel_filter_map] submits every element at once and lets the pool decide, so the
-    number of functions being translated simultaneously is the pool size no matter how
-    large each one is. On a large Rust crate that multiplies the working set of the
-    biggest functions: measured on [ferrosa_sstable.llbc] the fifteen-worker run passed
-    8.8 GiB and was still climbing, where the sequential run peaked at 2.0 GiB. Aeneas
-    already knows each function's size, so the bound belongs on what is in flight.
+    [parallel_filter_map] submits every element at once and lets the pool
+    decide, so the number of functions being translated simultaneously is the
+    pool size no matter how large each one is. On a large Rust crate that
+    multiplies the working set of the biggest functions: measured on
+    [ferrosa_sstable.llbc] the fifteen-worker run passed 8.8 GiB and was still
+    climbing, where the sequential run peaked at 2.0 GiB. Aeneas already knows
+    each function's size, so the bound belongs on what is in flight.
 
-    Elements are packed into waves in input order: a wave stops growing at [max_jobs]
-    elements or when the sum of their [cost] would pass [budget]. Each wave is awaited
-    before the next is submitted, so the bound holds at every instant, and results keep
-    the input order. An element whose own cost exceeds [budget] runs in a wave by itself
-    rather than being dropped. *)
+    Elements are packed into waves in input order: a wave stops growing at
+    [max_jobs] elements or when the sum of their [cost] would pass [budget].
+    Each wave is awaited before the next is submitted, so the bound holds at
+    every instant, and results keep the input order. An element whose own cost
+    exceeds [budget] runs in a wave by itself rather than being dropped. *)
 let parallel_filter_map_bounded_aux ~(cost : 'a -> int) ~(budget : int)
     ~(max_jobs : int) (f : 'a -> 'b option) (ls : 'a list) : 'b list =
   if not !Config.parallel then List.filter_map f ls
@@ -147,7 +148,11 @@ let parallel_filter_map_bounded_aux ~(cost : 'a -> int) ~(budget : int)
     let budget = max 1 budget in
     let waves =
       let rec go acc cur cur_cost = function
-        | [] -> List.rev (match cur with [] -> acc | _ -> List.rev cur :: acc)
+        | [] ->
+            List.rev
+              (match cur with
+              | [] -> acc
+              | _ -> List.rev cur :: acc)
         | x :: rest ->
             let x_cost = cost x in
             if cur = [] then go acc [ x ] x_cost rest
@@ -177,17 +182,19 @@ let parallel_filter_map_bounded ~cost ~budget ~max_jobs f ls =
 
 (** What one worker is allowed to hold.
 
-    A worker keeps the symbolic body of the function it is translating alive until the
-    function is done, and on [ferrosa_sstable.llbc] a single function reached ~4 GiB of
-    live data. That number is the reason the worker count cannot follow the core count. *)
+    A worker keeps the symbolic body of the function it is translating alive
+    until the function is done, and on [ferrosa_sstable.llbc] a single function
+    reached ~4 GiB of live data. That number is the reason the worker count
+    cannot follow the core count. *)
 let per_worker_mb = 4096
 
 (** How many functions may be translated at once.
 
-    Half of the available memory is the ceiling, so a translator running next to a desktop
-    leaves that desktop usable; [cores - 1] is the floor of ambition, since more workers
-    than cores only adds contention. A reading of [0] means the memory could not be
-    determined, and the core count is all that is known. *)
+    Half of the available memory is the ceiling, so a translator running next to
+    a desktop leaves that desktop usable; [cores - 1] is the floor of ambition,
+    since more workers than cores only adds contention. A reading of [0] means
+    the memory could not be determined, and the core count is all that is known.
+*)
 let max_jobs_for ~(available_mb : int) ~(cores : int) : int =
   let by_cores = Stdlib.max 1 (cores - 1) in
   if available_mb <= 0 then by_cores
@@ -198,8 +205,8 @@ let max_jobs_for ~(available_mb : int) ~(cores : int) : int =
 
 (** Available memory in MiB, when the platform says so.
 
-    Only Linux publishes this in a form that needs no process spawn; elsewhere the caller
-    falls back to the core count. *)
+    Only Linux publishes this in a form that needs no process spawn; elsewhere
+    the caller falls back to the core count. *)
 let available_memory_mb () : int =
   try
     let channel = open_in "/proc/meminfo" in
@@ -215,19 +222,23 @@ let available_memory_mb () : int =
                     String.split_on_char ' ' (String.trim rest)
                     |> List.filter (fun s -> s <> "")
                   with
-                  | value :: _ -> ( try Some (int_of_string value / 1024) with _ -> None)
+                  | value :: _ -> (
+                      try Some (int_of_string value / 1024) with _ -> None)
                   | [] -> None)
               | _ -> scan ())
           | exception End_of_file -> None
         in
-        match scan () with Some mb -> mb | None -> 0)
+        match scan () with
+        | Some mb -> mb
+        | None -> 0)
   with _ -> 0
 
 (** How many workers a memory attribution run may use.
 
-    A per-function delta measured while other domains are translating belongs partly to
-    the neighbours, so asking for attribution selects one worker. Returning the request
-    unchanged when nobody asked keeps this from becoming a silent global serialiser. *)
+    A per-function delta measured while other domains are translating belongs
+    partly to the neighbours, so asking for attribution selects one worker.
+    Returning the request unchanged when nobody asked keeps this from becoming a
+    silent global serialiser. *)
 let jobs_for_diagnosis ~(diagnose_memory : bool) ~(max_jobs : int) : int =
   if diagnose_memory then 1 else max_jobs
 

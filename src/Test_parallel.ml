@@ -27,10 +27,22 @@ let expect (what : string) (expected : int) (actual : int) =
 
 (* What the scheduler is doing right now. Both fields are updated from the
    worker domains, so reads and writes go through the same mutex. *)
-type gauge = { mutable running : int; mutable running_cost : int; mutable peak_jobs : int; mutable peak_cost : int; peak_mutex : Mutex.t }
+type gauge = {
+  mutable running : int;
+  mutable running_cost : int;
+  mutable peak_jobs : int;
+  mutable peak_cost : int;
+  peak_mutex : Mutex.t;
+}
 
 let gauge () =
-  { running = 0; running_cost = 0; peak_jobs = 0; peak_cost = 0; peak_mutex = Mutex.create () }
+  {
+    running = 0;
+    running_cost = 0;
+    peak_jobs = 0;
+    peak_cost = 0;
+    peak_mutex = Mutex.create ();
+  }
 
 let sample (g : gauge) (cost : int) (delta : int) =
   Mutex.lock g.peak_mutex;
@@ -58,8 +70,9 @@ let () =
   (* Two jobs at a time, whatever the costs are. *)
   let g = gauge () in
   let out =
-    Parallel.parallel_filter_map_bounded ~cost:(fun _ -> 1) ~budget:1000
-      ~max_jobs:2
+    Parallel.parallel_filter_map_bounded
+      ~cost:(fun _ -> 1)
+      ~budget:1000 ~max_jobs:2
       (fun x ->
         with_gauge g 1 (fun () ->
             spin ();
@@ -72,7 +85,18 @@ let () =
   (* Cost at a time, whatever the job count is. Costs 6,6,4,4,1,1,1,1 with a
      budget of 10 can only ever hold one six and one four. *)
   let g = gauge () in
-  let weighted = [ (6, "a"); (6, "b"); (4, "c"); (4, "d"); (1, "e"); (1, "f"); (1, "g"); (1, "h") ] in
+  let weighted =
+    [
+      (6, "a");
+      (6, "b");
+      (4, "c");
+      (4, "d");
+      (1, "e");
+      (1, "f");
+      (1, "g");
+      (1, "h");
+    ]
+  in
   let out =
     Parallel.parallel_filter_map_bounded ~cost:fst ~budget:10 ~max_jobs:8
       (fun (cost, label) ->
@@ -83,30 +107,42 @@ let () =
   in
   if g.peak_cost < 8 || g.peak_cost > 10 then begin
     incr failures;
-    Printf.printf "FAIL  %-52s expected 8..10 got %d\n" "bounded window: peak cost with budget=10" g.peak_cost
+    Printf.printf "FAIL  %-52s expected 8..10 got %d\n"
+      "bounded window: peak cost with budget=10" g.peak_cost
   end
-  else Printf.printf "PASS  %-52s %d\n" "bounded window: peak cost with budget=10" g.peak_cost;
+  else
+    Printf.printf "PASS  %-52s %d\n" "bounded window: peak cost with budget=10"
+      g.peak_cost;
   expect "bounded window: weighted results count" 8 (List.length out);
 
   (* Order and dropping must match the sequential filter_map exactly. *)
   let input = items 12 in
-  let keep = function x when x mod 3 = 0 -> Some x | _ -> None in
+  let keep = function
+    | x when x mod 3 = 0 -> Some x
+    | _ -> None
+  in
   let sequential = List.filter_map keep input in
   let bounded =
-    Parallel.parallel_filter_map_bounded ~cost:(fun _ -> 1) ~budget:4 ~max_jobs:3 keep input
+    Parallel.parallel_filter_map_bounded
+      ~cost:(fun _ -> 1)
+      ~budget:4 ~max_jobs:3 keep input
   in
   if sequential <> bounded then begin
     incr failures;
-    Printf.printf "FAIL  %-52s sequential and bounded results differ\n" "bounded window: order and drops"
+    Printf.printf "FAIL  %-52s sequential and bounded results differ\n"
+      "bounded window: order and drops"
   end
-  else Printf.printf "PASS  %-52s %s\n" "bounded window: order and drops" "identical";
+  else
+    Printf.printf "PASS  %-52s %s\n" "bounded window: order and drops"
+      "identical";
 
   (* With parallelism off the bound is trivially one. *)
   Config.parallel := false;
   let g = gauge () in
   ignore
-    (Parallel.parallel_filter_map_bounded ~cost:(fun _ -> 1) ~budget:1000
-       ~max_jobs:4
+    (Parallel.parallel_filter_map_bounded
+       ~cost:(fun _ -> 1)
+       ~budget:1000 ~max_jobs:4
        (fun x -> with_gauge g 1 (fun () -> Some x))
        (items 6));
   expect "sequential mode: peak jobs" 1 g.peak_jobs;
@@ -121,8 +157,9 @@ let () =
     Some x
   in
   ignore
-    (Parallel.parallel_filter_map_bounded ~cost:(fun _ -> 9) ~budget:1 ~max_jobs:2
-       guarded (items 8));
+    (Parallel.parallel_filter_map_bounded
+       ~cost:(fun _ -> 9)
+       ~budget:1 ~max_jobs:2 guarded (items 8));
   expect "bounded window: elements visited once" 8
     (Array.fold_left (fun acc n -> if n = 1 then acc + 1 else acc) 0 seen);
 
@@ -139,5 +176,6 @@ let () =
   expect "worker count: no memory reading, 16 cores" 15
     (Parallel.max_jobs_for ~available_mb:0 ~cores:16);
 
-  Printf.printf "\n%s\n" (if !failures = 0 then "ALL PASS" else Printf.sprintf "%d FAILED" !failures);
+  Printf.printf "\n%s\n"
+    (if !failures = 0 then "ALL PASS" else Printf.sprintf "%d FAILED" !failures);
   exit (if !failures = 0 then 0 else 1)

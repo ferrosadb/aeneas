@@ -2215,7 +2215,7 @@ let eliminate_box_functions_visitor (ctx : ctx) (def : fun_decl) =
 
     method! visit_texpr env e =
       match opt_destruct_function_call e with
-      | Some (fun_id, _generics, args) -> (
+      | Some (fun_id, _generics, args) ->
           (* The callee's declaration may be absent from [ctx.fun_decls]: a
              function which was not translated (external, or whose body failed)
              is not in the map. It is then certainly not one of the box
@@ -2226,15 +2226,14 @@ let eliminate_box_functions_visitor (ctx : ctx) (def : fun_decl) =
             match fun_id with
             | Fun (FromLlbc (FunId fid, _lp_id)) -> (
                 match FunDeclId.Map.find_opt fid ctx.fun_decls with
-                | Some decl ->
-                    decl.item_meta.diagnostic_item = Some "box_new"
+                | Some decl -> decl.item_meta.diagnostic_item = Some "box_new"
                 | None -> false)
             | _ -> false
           in
           if is_box_new then
             let arg, args = Collections.List.pop args in
             [%add_loc] mk_apps span arg args
-          else super#visit_texpr env e)
+          else super#visit_texpr env e
       | _ -> super#visit_texpr env e
   end
 
