@@ -502,13 +502,13 @@ let max_parallel_jobs = ref 0
 let parallel_budget = ref 0
 
 (** Attribute live memory to each function as it finishes, on stderr. Forces one
-    worker, because a delta measured while other domains translate belongs to them
-    too. *)
+    worker, because a delta measured while other domains translate belongs to
+    them too. *)
 let diagnose_memory = ref false
 
-(** Refuse to go past this much live data, in MiB, naming the function that crossed it.
-    [0] is no limit. Set by callers that would rather have a clear failure than a
-    cgroup kill. *)
+(** Refuse to go past this much live data, in MiB, naming the function that
+    crossed it. [0] is no limit. Set by callers that would rather have a clear
+    failure than a cgroup kill. *)
 let memory_limit_mb = ref 0
 
 (** Display a progress bar *)

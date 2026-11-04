@@ -22,7 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace builtin_auto
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [core::ptr::null]:
     Source: '/rustc/library/core/src/ptr/mod.rs', lines 877:0-877:55

@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace drop
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [drop::fill]: loop body 0:
     Source: 'tests/src/drop.rs', lines 7:4-9:5 -/

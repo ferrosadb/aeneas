@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace issue_1206_loop_break
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [issue_1206_loop_break::first_nonzero]: loop body 0:
     Source: 'tests/src/issue-1206-loop-break.rs', lines 1:0-11:5

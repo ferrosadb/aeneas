@@ -22,7 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace defaulted_method
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- Trait declaration: [defaulted_method::Trait]
     Source: 'tests/src/defaulted_method.rs', lines 2:0-7:1 -/

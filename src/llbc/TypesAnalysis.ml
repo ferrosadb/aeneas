@@ -420,15 +420,19 @@ let analyze_full_ty (span : Meta.span option) (updated : bool ref)
            explore the parameters both sides agree on: the pass stays
            conservative rather than dying. *)
         let param_infos, param_tys =
-          if List.length adt_info.param_infos <> List.length generics.types
-          then begin
+          if List.length adt_info.param_infos <> List.length generics.types then begin
             [%save_error_opt_span] span
               (Printf.sprintf
-                 "Type declaration has %d type parameter(s) but is instantiated \
-                  with %d type argument(s); exploring the common prefix"
+                 "Type declaration has %d type parameter(s) but is \
+                  instantiated with %d type argument(s); exploring the common \
+                  prefix"
                  (List.length adt_info.param_infos)
                  (List.length generics.types));
-            let n = min (List.length adt_info.param_infos) (List.length generics.types) in
+            let n =
+              min
+                (List.length adt_info.param_infos)
+                (List.length generics.types)
+            in
             ( List.filteri (fun i _ -> i < n) adt_info.param_infos,
               List.filteri (fun i _ -> i < n) generics.types )
           end

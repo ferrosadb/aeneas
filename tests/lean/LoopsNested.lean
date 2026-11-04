@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace loops_nested
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [loops_nested::iter]: loop body 1:
     Source: 'tests/src/loops-nested.rs', lines 7:8-9:9

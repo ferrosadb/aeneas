@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace assert_cfg
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [assert_cfg::get_b0]:
     Source: 'tests/src/assert-cfg.rs', lines 3:0-5:1 -/

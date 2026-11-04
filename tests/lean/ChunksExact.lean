@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace chunks_exact
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [chunks_exact::test_chunks_exact_exact_fit]:
     Source: 'tests/src/chunks_exact.rs', lines 8:0-22:1

@@ -127,6 +127,12 @@ jobs:
       - if: needs.diff_lean_files.outputs.check_lean == 'true'
         # Lean cannot run its tests in the nix sandbox because `elan` will download things
         run: nix develop --command bash -c "cd tests/lean && make"
+      - if: needs.diff_lean_files.outputs.check_lean == 'true'
+        name: Check opaque trait reachability
+        run: |
+          package=$(nix build --no-link --print-out-paths .#aeneas)
+          nix develop --command env AENEAS="$package/bin/aeneas" CHARON="$package/bin/charon" \
+            LEAN_PKG="$PWD/backends/lean" bash tests/regression/opaque-reachability.sh
       - if: >-
           needs.diff_lean_files.outputs.check_lean == 'true' ||
           needs.diff_lean_files.outputs.check_extract_builtin == 'true'
