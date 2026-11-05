@@ -23,19 +23,6 @@ noncomputable section
 
 namespace closures
 
-/-- [core::iter::traits::iterator::Iterator::map]:
-    Source: '/rustc/library/core/src/iter/traits/iterator.rs', lines 845:4-848:34
-    Name pattern: [core::iter::traits::iterator::Iterator::map]
-    Visibility: public -/
-@[trait_default, rust_fun "core::iter::traits::iterator::Iterator::map"]
-def core.iter.traits.iterator.Iterator.map.default
-  {Self : Type _} {B : Type _} {F : Type _} {Clause0_Item : Type _}
-  (IteratorInst : core.iter.traits.iterator.Iterator Self Clause0_Item)
-  (opsfunctionFnMutFTupleClause0_ItemBInst : core.ops.function.FnMut F
-  Clause0_Item B) :
-  Self → F → Result (core.iter.adapters.map.Map Self F)
-  := sorry
-
 /-- [closures::call_fn_no_state::{closure}]
     Source: 'tests/src/closures.rs', lines 4:15-4:40 -/
 @[reducible]
@@ -298,7 +285,7 @@ def P.Insts.CoreOpsFunctionFnMutTupleU8U8 : core.ops.function.FnMut (Std.U8 →
 def map_fn_pointer (x : alloc.vec.Vec Std.U8) : Result Unit := do
   let ii ← alloc.vec.IntoIteratorVec.into_iter x
   let _ ←
-    core.iter.traits.iterator.Iterator.map.default
+    core.iter.traits.iterator.Iterator.map.trait_default
       (core.iter.traits.iterator.IteratorVecIntoIter Std.U8)
       P.Insts.CoreOpsFunctionFnMutTupleU8U8 ii (u8_id)
   ok ()

@@ -22,8 +22,6 @@ set_option maxRecDepth 2048
 noncomputable section
 
 namespace iterator_count
-def core.num.nonzero.ZeroablePrimitive (Self : Type _) (T1 : Type _) : Type := sorry
-def core.cmp.clamp.ClampBounds (Self : Type _) (T1 : Type _) : Type := sorry
 
 /-- [iterator_count::slice_count]:
     Source: 'tests/src/iterator_count.rs', lines 17:0-19:1
