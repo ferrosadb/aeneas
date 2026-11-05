@@ -121,6 +121,7 @@
   SymbolicToPureTypes
   SymbolicToPureValues
   SynthesizeSymbolic
+  Trace_ring
   TranslateCore
   Translate
   TypesAnalysis
@@ -225,3 +226,13 @@
  (alias runtest)
  (action
   (run ./test_diagnose.exe)))
+
+(executable
+ (name test_trace_ring)
+ (modules Test_trace_ring)
+ (libraries aeneas))
+
+(rule
+ (alias runtest)
+ (action
+  (run ./test_trace_ring.exe)))
