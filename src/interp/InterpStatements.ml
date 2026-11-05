@@ -937,11 +937,8 @@ and eval_switch_raw (config : config) (span : Meta.span) (data : switch_data)
                 (S.mk_opt_place_from_op span op ctx)
                 ctx
             in
-            (* Check if we should join the states after the if then else *)
-            let join =
-              (not (block_has_break_continue_return true_block))
-              && not (block_has_break_continue_return false_block)
-            in
+            (* Evaluate both branches, then let what they ended in decide whether the
+               contexts are joined. *)
             let resl_true = eval_block config true_block true_ctx in
             let resl_false = eval_block config false_block false_ctx in
             let ctx_resl, cf_branches =
@@ -952,13 +949,7 @@ and eval_switch_raw (config : config) (span : Meta.span) (data : switch_data)
               | [ e_true; e_false ] -> cf_bool (e_true, e_false)
               | _ -> [%internal_error] span
             in
-            if join then
-              try eval_switch_with_join config span cc ctx0 ctx_resl
-              with Errors.RFailure ->
-                (* If the join threw a recoverable error we do not join
-                   and simply duplicate the code *)
-                (ctx_resl, cc)
-            else (ctx_resl, cc)
+            join_branches_or_duplicate config span cc ctx0 ctx_resl
         | VLiteral (VScalar sv), TScalar (TInteger _ as int_ty) ->
             (* Sanity check *)
             [%sanity_check] span (Scalars.get_ty sv = scalar_as_integer int_ty);
@@ -995,11 +986,6 @@ and eval_switch_raw (config : config) (span : Meta.span) (data : switch_data)
             (* Then evaluate the "otherwise" branch *)
             let resl_otherwise = eval_block config otherwise ctx_otherwise in
 
-            (* Should we join the contexts after the switch? *)
-            let join =
-              (not (List.exists block_has_break_continue_return target_blocks))
-              && not (block_has_break_continue_return otherwise)
-            in
             let resl, cf =
               comp_seqs __FILE__ __LINE__ span
                 (resl_branches @ [ resl_otherwise ])
@@ -1009,16 +995,7 @@ and eval_switch_raw (config : config) (span : Meta.span) (data : switch_data)
               cf_int (el, e_otherwise)
             in
             let cf = cc_comp cc cf in
-            if join then
-              (* Join the contexts *)
-              try eval_switch_with_join config span cf ctx0 resl
-              with Errors.RFailure ->
-                (* If the join threw a recoverable error we do not join
-                   and simply duplicate the code *)
-                (resl, cf)
-            else
-              (* Do not join the contexts: compose the continuations and continue *)
-              (resl, cf)
+            join_branches_or_duplicate config span cf ctx0 resl
         | _ -> [%craise] span "Unsupported switch scrutinee"
       in
       (* Compose *)
@@ -1062,25 +1039,60 @@ and eval_switch_raw (config : config) (span : Meta.span) (data : switch_data)
                 (fun ctx -> (eval_switch config span data branches) ctx)
                 ctxl
             in
-            (* Should we join the contexts after the match? *)
-            let join =
-              not (List.exists block_has_break_continue_return branches)
-            in
+            (* Evaluate every arm, then decide on the results. *)
             let ctx_resl, cf = comp_seqs __FILE__ __LINE__ span resl in
             let cc = cc_comp cf_expand cf in
-            if join then (* Join the contexts *)
-              try eval_switch_with_join config span cc ctx0 ctx_resl
-              with Errors.RFailure ->
-                (* If the join threw a recoverable error we do not join
-                   and simply duplicate the code *)
-                (ctx_resl, cc)
-            else
-              (* Compose the continuations *)
-              (ctx_resl, cc)
+            join_branches_or_duplicate config span cc ctx0 ctx_resl
         | _ -> [%craise] span "Inconsistent state"
       in
       (* Compose *)
       (ctx_resl, cc_comp cf_read_p cf_match)
+
+(** Join the contexts the branches of a switch ended in, or duplicate the code
+    after it.
+
+    Joining is what keeps a body narrow: with it, [n] branch contexts become one
+    and the rest of the block is evaluated once. Without it, every branch
+    continues on its own and the rest of the block is evaluated once per branch
+    -- so one switch that is not joined multiplies the number of paths through
+    the enclosing function rather than widening it by one, and nested switches
+    multiply.
+
+    What decides it is the results, through {!Cps.joins}: two or more branches
+    that ended in [Unit] go on to the rest of the block and are worth merging,
+    and a branch that ended in [break], [continue] or [return] cannot be merged
+    at all. Asking the sub-blocks instead ("does any branch contain a [break]
+    anywhere below it") answers a different question, because a block's tail is
+    where the loop's own [break] lives: it declined to join in 16476 of 16476
+    branch points measured on one crate, which duplicated the rest of the block
+    once per branch and left 8230 contexts in a single statement list.
+
+    A branch point that has finished paths *and* two or more continuing ones
+    cannot be joined as it stands, and that is not a limitation of this decision
+    procedure: a [Let] binds a value, so the symbolic AST forbids [break] and
+    [continue] in the bound expression
+    ({!SymbolicToPureExpressions.translate_let} sets those builders to [None]),
+    and a join is exactly a [Let] over the branch expression. Merging the
+    staying branches therefore needs the continuation to be handed to each arm
+    separately rather than as one list, which is a change to {!Cps.stl_cm_fun}
+    and its callers. Until then such a branch point is duplicated, which is why
+    the width is what it is. *)
+and join_branches_or_duplicate (config : config) (span : Meta.span)
+    (cf : SA.expr list -> SA.expr) (ctx0 : eval_ctx)
+    (ctx_resl : (eval_ctx * statement_eval_res) list) :
+    (eval_ctx * statement_eval_res) list * (SA.expr list -> SA.expr) =
+  let continuing =
+    List.length (List.filter (fun (_, res) -> res = Unit) ctx_resl)
+  in
+  let exiting = List.length ctx_resl - continuing in
+  if not (Cps.joins ~continuing ~exiting) then (ctx_resl, cf)
+  else
+    match eval_switch_with_join config span cf ctx0 ctx_resl with
+    | resl, cf -> (resl, cf)
+    | exception Errors.RFailure ->
+        (* If the join threw a recoverable error we do not join and simply
+           duplicate the code *)
+        (ctx_resl, cf)
 
 (** Evaluate a switch in case we need to branch and want to join the contexts
     afterwards.

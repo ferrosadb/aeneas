@@ -189,22 +189,6 @@ let statement_has_break_continue_return (st : statement) : bool =
     false
   with Utils.Found -> true
 
-(** Return true if the block contains a statement which breaks the control flow,
-    at the exception of panics (that is: a break, a continue or a return) *)
-let block_has_break_continue_return (st : block) : bool =
-  let visitor =
-    object
-      inherit [_] iter_statement
-      method! visit_Break _ _ = raise Utils.Found
-      method! visit_Continue _ _ = raise Utils.Found
-      method! visit_Return _ = raise Utils.Found
-    end
-  in
-  try
-    visitor#visit_block () st;
-    false
-  with Utils.Found -> true
-
 (** Compute the size of a function body - we count the number of statements and
     blocks *)
 let compute_body_size (b : body) : int =
