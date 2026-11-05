@@ -9,9 +9,9 @@ invent a second encoding, and do not edit files outside your owned set.
 Lean 4.35 rejects an inductive with more than **244 constructors**
 (`tag for constructor 'X.c244' is too big`). `rustls::enums::CipherSuite` has 376/377
 variants, which today kills the whole enum and cascades into ~94 errors in
-`ferrosa_net`. Measured: hand-replacing the enum with the encoding below on the
-real emitted file took that module from 101 to 40 elaboration errors with the
-cascade gone.
+the module that carries it. Measured: hand-replacing the enum with the encoding
+below on the real emitted file took that module from 101 to 40 elaboration
+errors with the cascade gone.
 
 ## The encoding (exact Lean text)
 
@@ -65,8 +65,8 @@ reachable when the tag matches, so the `Option` is inhabited). Bind `x` once wit
 
 | Side | Owns | Must not touch |
 |---|---|---|
-| A (`~/src/aeneas-wt-types`, branch `wide-enum-types`) | the shared predicate, the Lean qualifier for wide enums, the enum body, the constructor `def`s | `Extract.ml` match arm, `ExtractBase.ml` discriminant path |
-| B (`~/src/aeneas-wt-match`, branch `wide-enum-match`) | `extract_texpr`'s `| Match branches ->` arm, `Discriminant`/`read_discriminant` | `ExtractTypes.ml`, the predicate's file |
+| A (`$WT_TYPES`, branch `wide-enum-types`) | the shared predicate, the Lean qualifier for wide enums, the enum body, the constructor `def`s | `Extract.ml` match arm, `ExtractBase.ml` discriminant path |
+| B (`$WT_MATCH`, branch `wide-enum-match`) | `extract_texpr`'s `| Match branches ->` arm, `Discriminant`/`read_discriminant` | `ExtractTypes.ml`, the predicate's file |
 
 Shared predicate, written by **A**, consumed by **B**:
 
@@ -90,9 +90,9 @@ cd <worktree>/src && eval $(opam env --switch=aeneas --set-switch) && dune build
 Translation + elaboration (both are minutes, run them in the background and poll):
 
 ```bash
-cd ~/src/ferrosa-suite/ferrosa
-~/src/aeneas-wt-<side>/src/_build/default/main.exe -backend lean -dest /tmp/we-<side> ferrosa_net.llbc
-cd ~/.local/aeneas/backends/lean && lake env lean /tmp/we-<side>/FerrosaNet.lean 2>&1 | grep -c error
+cd <crate checkout>
+<worktree>/src/_build/default/main.exe -backend lean -dest /tmp/we-<side> crate.llbc
+cd ~/.local/aeneas/backends/lean && lake env lean /tmp/we-<side>/Crate.lean 2>&1 | grep -c error
 ```
 
 Baseline for comparison, on this machine, same `llbc`: **101** errors, 94 of them

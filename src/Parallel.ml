@@ -127,8 +127,8 @@ let parallel_filter_map_pool f ls =
     [parallel_filter_map] submits every element at once and lets the pool
     decide, so the number of functions being translated simultaneously is the
     pool size no matter how large each one is. On a large Rust crate that
-    multiplies the working set of the biggest functions: measured on
-    [ferrosa_sstable.llbc] the fifteen-worker run passed 8.8 GiB and was still
+    multiplies the working set of the biggest functions: measured on a large
+    extracted crate the fifteen-worker run passed 8.8 GiB and was still
     climbing, where the sequential run peaked at 2.0 GiB. Aeneas already knows
     each function's size, so the bound belongs on what is in flight.
 
@@ -183,9 +183,9 @@ let parallel_filter_map_bounded ~cost ~budget ~max_jobs f ls =
 (** What one worker is allowed to hold.
 
     A worker keeps the symbolic body of the function it is translating alive
-    until the function is done, and on [ferrosa_sstable.llbc] a single function
-    reached ~4 GiB of live data. That number is the reason the worker count
-    cannot follow the core count. *)
+    until the function is done, and on one such crate a single function reached
+    ~4 GiB of live data. That number is the reason the worker count cannot
+    follow the core count. *)
 let per_worker_mb = 4096
 
 (** How many functions may be translated at once.

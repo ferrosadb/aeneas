@@ -1,6 +1,6 @@
 (* Attribution of translator memory to functions.
 
-   The run this exists for is the one that gets killed: `ferrosa_sstable.llbc` reached 18.5
+   The run this exists for is the one that gets killed: a large extracted crate reached 18.5
    GiB of anonymous RSS and the cgroup took it, and the Gc statistics that aeneas already
    prints said live data was growing while the heap stayed near 1.4x live. That rules out
    the collector but cannot say *which function* is holding the memory, because the report
@@ -47,9 +47,8 @@ let () =
      signed, and the name last so it reads like an incident log. *)
   expect "memory_line: growth"
     "mem  +256.0 MiB  live   1024.0 MiB  size    4211  rank     3  \
-     ferrosa_sstable::compression::Compression::decompress"
-    (Diagnose.memory_line
-       ~name:"ferrosa_sstable::compression::Compression::decompress"
+     app::compression::Compression::decompress"
+    (Diagnose.memory_line ~name:"app::compression::Compression::decompress"
        ~delta_words:(256 * 131_072) ~live_words:(1024 * 131_072) ~size:4211
        ~rank:3);
   expect "memory_line: negative delta prints its sign"
@@ -62,8 +61,8 @@ let () =
      leaves naming it. *)
   expect "running_line: names the function in flight"
     "mem    running     live   3072.0 MiB  size  204800  rank     1  \
-     ferrosa_sstable::Storage::write_partition"
-    (Diagnose.running_line ~name:"ferrosa_sstable::Storage::write_partition"
+     app::Storage::write_partition"
+    (Diagnose.running_line ~name:"app::Storage::write_partition"
        ~live_words:(3072 * 131_072) ~size:204_800 ~rank:1);
 
   (* Attribution needs one worker; asking for more must not silently produce numbers that

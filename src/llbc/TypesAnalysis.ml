@@ -416,7 +416,7 @@ let analyze_full_ty (span : Meta.span option) (updated : bool ref)
            then explore the type *)
         (* [List.combine] raises [Invalid_argument] when a declaration's
            parameters and this instantiation disagree in length, and that
-           aborted the whole crate (ferrosa_graph). Report the disagreement and
+           aborted the whole crate (a graph crate). Report the disagreement and
            explore the parameters both sides agree on: the pass stays
            conservative rather than dying. *)
         let param_infos, param_tys =

@@ -981,7 +981,7 @@ and extract_function_call (span : Meta.span) (ctx : extraction_ctx)
               (* The call goes through a trait this crate does not declare, so
                  there is no span to comment on and no method to qualify. A bare
                  [Map.find] raised [Not_found] here and killed the whole run
-                 (ferrosa_index); a missing declaration is already an error, and
+                 (an index crate); a missing declaration is already an error, and
                  the callee name degrades to the unqualified form. *)
               [%save_error] span
                 "Missing trait declaration for a called trait method; printing \

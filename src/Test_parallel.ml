@@ -4,7 +4,7 @@
    decide: on a 16-core host that is 15 workers, each translating a whole Rust
    function. Aeneas already knows each function's size, so a run can be bounded
    by what is in flight instead of by what is queued -- the measured difference
-   on `ferrosa_sstable.llbc` was 8.8+ GiB and climbing versus 2.0 GiB, with the
+   on a large extracted crate was 8.8+ GiB and climbing versus 2.0 GiB, with the
    cgroup killing the former.
 
    These cases pin the two bounds independently, because a scheduler that
