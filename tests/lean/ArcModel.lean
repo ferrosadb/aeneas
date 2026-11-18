@@ -58,7 +58,7 @@ structure Row where
   cells : alloc.vec.Vec Std.U32
 
 /-- [arc_model::share_and_read]:
-    Source: 'tests/src/arc_model.rs', lines 22:0-25:1
+    Source: 'tests/src/arc_model.rs', lines 22:0-28:1
     Visibility: public -/
 def share_and_read (key : Std.U32) : Result Std.U32 := do
   let row ←
@@ -68,7 +68,7 @@ def share_and_read (key : Std.U32) : Result Std.U32 := do
   ok r.key
 
 /-- [arc_model::share_twice]:
-    Source: 'tests/src/arc_model.rs', lines 28:0-31:1
+    Source: 'tests/src/arc_model.rs', lines 31:0-34:1
     Visibility: public -/
 def share_twice
   (row : alloc.sync.Arc Row) :
@@ -78,7 +78,7 @@ def share_twice
   ok (row, other)
 
 /-- [arc_model::owned_or_shared]:
-    Source: 'tests/src/arc_model.rs', lines 34:0-39:1
+    Source: 'tests/src/arc_model.rs', lines 37:0-42:1
     Visibility: public -/
 def owned_or_shared (row : alloc.sync.Arc Row) : Result Std.U32 := do
   let r ← lift (alloc.sync.Arc.try_unwrap row)
@@ -89,12 +89,12 @@ def owned_or_shared (row : alloc.sync.Arc Row) : Result Std.U32 := do
     ok r1.key
 
 /-- [arc_model::first_key::{closure}]
-    Source: 'tests/src/arc_model.rs', lines 43:21-43:30 -/
+    Source: 'tests/src/arc_model.rs', lines 46:21-46:30 -/
 @[reducible]
 def first_key.closure := Unit
 
 /-- [arc_model::first_key::{impl core::ops::function::FnOnce<(&'_0 alloc::sync::Arc<arc_model::Row>,), u32> for arc_model::first_key::{closure}<'_0>}::call_once]:
-    Source: 'tests/src/arc_model.rs', lines 43:21-43:30 -/
+    Source: 'tests/src/arc_model.rs', lines 46:21-46:30 -/
 def
   first_key.closure.Insts.CoreOpsFunctionFnOnceTupleShared0ArcRowU32.call_once
   (c : first_key.closure) (tupled_args : alloc.sync.Arc Row) :
@@ -104,7 +104,7 @@ def
   ok r.key
 
 /-- Trait implementation: [arc_model::first_key::{impl core::ops::function::FnOnce<(&'_0 alloc::sync::Arc<arc_model::Row>,), u32> for arc_model::first_key::{closure}<'_0>}]
-    Source: 'tests/src/arc_model.rs', lines 43:21-43:30 -/
+    Source: 'tests/src/arc_model.rs', lines 46:21-46:30 -/
 @[reducible]
 def first_key.closure.Insts.CoreOpsFunctionFnOnceTupleShared0ArcRowU32 :
   core.ops.function.FnOnce first_key.closure (alloc.sync.Arc Row) Std.U32 := {
@@ -113,7 +113,7 @@ def first_key.closure.Insts.CoreOpsFunctionFnOnceTupleShared0ArcRowU32 :
 }
 
 /-- [arc_model::first_key]:
-    Source: 'tests/src/arc_model.rs', lines 42:0-44:1
+    Source: 'tests/src/arc_model.rs', lines 45:0-47:1
     Visibility: public -/
 def first_key
   (rows : alloc.vec.Vec (alloc.sync.Arc Row)) : Result (Option Std.U32) := do

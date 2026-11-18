@@ -20,7 +20,10 @@ pub struct Row {
 
 /// `Arc::new`, then a read through `Deref`.
 pub fn share_and_read(key: u32) -> u32 {
-    let row = Arc::new(Row { key, cells: Vec::new() });
+    let row = Arc::new(Row {
+        key,
+        cells: Vec::new(),
+    });
     row.key
 }
 
