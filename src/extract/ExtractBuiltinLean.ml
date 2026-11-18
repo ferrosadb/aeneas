@@ -89,9 +89,9 @@ let lean_builtin_types =
     mk_type "core::panicking::AssertKind" "core.panicking.AssertKind"
       ~kind:
         (KEnum [ ("Eq", Some "Eq"); ("Ne", Some "Ne"); ("Match", Some "Match") ]);
-    (* file: "Aeneas/Std/Core/Pin.lean", line: 8 *)
+    (* file: "Aeneas/Std/Core/Pin.lean", line: 9 *)
     mk_type "core::pin::Pin" "core.pin.Pin";
-    (* file: "Aeneas/Std/Core/Pin.lean", line: 12 *)
+    (* file: "Aeneas/Std/Core/Pin.lean", line: 13 *)
     mk_type "core::pin::helper::PinHelper" "core.pin.helper.PinHelper";
     (* file: "Aeneas/Std/Core/Ptr.lean", line: 77 *)
     mk_type "core::ptr::alignment::Alignment" "core.ptr.alignment.Alignment";
@@ -183,6 +183,16 @@ let lean_builtin_types =
     mk_type "core::sync::atomic::AtomicBool" "core.sync.atomic.AtomicBool";
     (* file: "Aeneas/Std/Core/Atomic.lean", line: 12 *)
     mk_type "core::sync::atomic::AtomicU32" "core.sync.atomic.AtomicU32";
+    (* file: "Aeneas/Std/Futures.lean", line: 30 *)
+    mk_type "core::task::poll::Poll" "core.task.poll.Poll"
+      ~kind:(KEnum [ ("Ready", Some "Ready"); ("Pending", Some "Pending") ]);
+    (* file: "Aeneas/Std/Futures.lean", line: 37 *)
+    mk_type "core::task::wake::Context" "core.task.wake.Context"
+      ~mut_regions:[ 0 ];
+    (* file: "Aeneas/Std/Futures.lean", line: 72 *)
+    mk_type "futures_util::stream::stream::map::Map"
+      "futures_util.stream.stream.map.Map"
+      ~kind:(KStruct [ ("stream", Some "stream"); ("f", Some "f") ]);
   ]
 
 let lean_builtin_consts = []
@@ -1540,6 +1550,16 @@ let lean_builtin_trait_decls =
           ("index", "index");
           ("index_mut", "index_mut");
         ];
+    (* file: "Aeneas/Std/Futures.lean", line: 40 *)
+    mk_trait_decl "futures_core::stream::Stream" "futures_core.stream.Stream"
+      ~methods:[ ("poll_next", "poll_next") ];
+    (* file: "Aeneas/Std/Futures.lean", line: 50 *)
+    mk_trait_decl "futures_util::fns::FnMut1" "futures_util.fns.FnMut1"
+      ~parent_clauses:[ "FnOnce1Inst" ]
+      ~methods:[ ("call_mut", "call_mut") ];
+    (* file: "Aeneas/Std/Futures.lean", line: 46 *)
+    mk_trait_decl "futures_util::fns::FnOnce1" "futures_util.fns.FnOnce1"
+      ~methods:[ ("call_once", "call_once") ];
   ]
 
 let lean_builtin_trait_impls =
@@ -1819,4 +1839,15 @@ let lean_builtin_trait_impls =
     (* file: "Aeneas/Std/Slice.lean", line: 603 *)
     mk_trait_impl "core::slice::index::SliceIndex<usize, [@T], @T>"
       "core.slice.index.SliceIndexUsizeSlice";
+    (* file: "Aeneas/Std/Futures.lean", line: 97 *)
+    mk_trait_impl
+      "futures_core::stream::Stream<futures_util::stream::stream::map::Map<@St, \
+       @F>, @Clause1_Clause0_Output>"
+      "futures_util.stream.stream.map.Map.Insts.Futures_coreStreamStream";
+    (* file: "Aeneas/Std/Futures.lean", line: 64 *)
+    mk_trait_impl "futures_util::fns::FnMut1<@T, @A, @R>"
+      "futures_util.fns.FnMut1.Blanket";
+    (* file: "Aeneas/Std/Futures.lean", line: 57 *)
+    mk_trait_impl "futures_util::fns::FnOnce1<@T, @A, @R>"
+      "futures_util.fns.FnOnce1.Blanket";
   ]
